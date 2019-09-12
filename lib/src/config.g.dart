@@ -10,11 +10,14 @@ TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
   return $checkedNew('TestHtmlBuilderConfig', json, () {
     $checkKeys(json, allowedKeys: const ['templates']);
     final val = TestHtmlBuilderConfig(
-        templates: $checkedConvert(json, 'templates', (v) => v));
+      templates: $checkedConvert(
+          json,
+          'templates',
+          (v) => (v as Map)?.map(
+                (k, e) => MapEntry(k as String,
+                    (e as List)?.map((e) => e as String)?.toList()),
+              )),
+    );
     return val;
   });
 }
-
-Map<String, dynamic> _$TestHtmlBuilderConfigToJson(
-        TestHtmlBuilderConfig instance) =>
-    <String, dynamic>{'templates': instance.templates};

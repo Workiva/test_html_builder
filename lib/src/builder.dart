@@ -51,7 +51,7 @@ class TestHtmlBuilder implements Builder {
       return;
     }
     if (!await buildStep.canRead(templateId)) {
-      _log.warning('Could not read template at ${templateId.path}');
+      _log.severe('Could not read template at ${templateId.path}');
       return;
     }
 
@@ -59,16 +59,15 @@ class TestHtmlBuilder implements Builder {
         'Generating html for ${buildStep.inputId.path} from template at ${templateId.path}');
     var htmlContents = await buildStep.readAsString(templateId);
     if (!htmlContents.contains('{test}')) {
-      _log.warning(
+      _log.severe(
           'Test html template must contain a `{test}` token: ${templateId.path}');
       return;
     }
 
     htmlContents = htmlContents.replaceFirst(
         '{test}',
-        '\n'
-            '        <link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">\n'
-            '        <script src="packages/test/dart.js"></script>');
+        '<link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">'
+            '<script src="packages/test/dart.js"></script>');
     await buildStep.writeAsString(htmlId, htmlContents);
   }
 }
