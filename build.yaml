@@ -11,11 +11,3 @@ builders:
       - build_test|test_bootstrap
     defaults:
       generate_for: ["test/**_test.dart"]
-
-targets:
-  $default:
-    builders:
-      test_html_builder:
-        options:
-          templates:
-            "test/template.html": ["test/html_from_template_test.dart"]
