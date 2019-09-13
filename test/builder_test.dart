@@ -129,40 +129,36 @@ void main() {
     });
 
     test('logs SEVERE if template cannot be read', () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('Could not read template') &&
-              record.message.contains('test/template.html') &&
-              record.level == Level.SEVERE)));
-
       final config = TestHtmlBuilderConfig(templates: {
         'test/template.html': ['test/**_test.dart'],
       });
       final builder = TestHtmlBuilder(config);
-      await testBuilder(builder, {
-        'a|test/foo_test.dart': '',
-      });
+      final logs = recordLogs(() => testBuilder(builder, {
+            'a|test/foo_test.dart': '',
+          }));
+      expect(
+          logs,
+          emits(severeLogOf(allOf(
+            contains('Could not read template'),
+            contains('test/template.html'),
+          ))));
     });
 
     test('logs SEVERE if template does not contain `{test}` token', () async {
-      Logger.root.level = Level.ALL;
-      expect(
-          Logger.root.onRecord,
-          emitsThrough(predicate<LogRecord>((record) =>
-              record.message.contains('template must contain a `{test}`') &&
-              record.message.contains('test/template.html') &&
-              record.level == Level.SEVERE)));
-
       final config = TestHtmlBuilderConfig(templates: {
         'test/template.html': ['test/**_test.dart'],
       });
       final builder = TestHtmlBuilder(config);
-      await testBuilder(builder, {
-        'a|test/foo_test.dart': '',
-        'a|test/template.html': 'MISSING TOKEN',
-      });
+      final logs = recordLogs(() => testBuilder(builder, {
+            'a|test/foo_test.dart': '',
+            'a|test/template.html': 'MISSING TOKEN',
+          }));
+      expect(
+          logs,
+          emits(severeLogOf(allOf(
+            contains('template must contain a `{test}`'),
+            contains('test/template.html'),
+          ))));
     });
   });
 }
