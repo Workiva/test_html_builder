@@ -1,0 +1,13 @@
+builders:
+  test_html_builder:
+    import: "package:test_html_builder/builder.dart"
+    builder_factories: ["testHtmlBuilder"]
+    build_extensions:
+      _test.dart:
+        - _test.html
+    auto_apply: root_package
+    build_to: cache
+    runs_before:
+      - build_test|test_bootstrap
+    defaults:
+      generate_for: ["test/**_test.dart"]
