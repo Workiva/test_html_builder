@@ -6,7 +6,9 @@ cache:
     - $HOME/.pub-cache
 
 dart:
-  - 2.3.2
+  # TODO: uncomment this when we have a way to only run the dartfmt check on
+  #       the stable channel of Dart
+  # - 2.3.2
   - stable
   - dev
 
