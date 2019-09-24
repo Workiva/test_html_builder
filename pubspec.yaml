@@ -1,6 +1,13 @@
 name: test_html_builder
 version: 1.0.0
-private: true
+homepage: https://github.com/Workiva/test_html_builder
+
+description: >
+  Builder that generates HTML files from templates for dart tests.
+
+authors:
+  - Workiva Client Platform Team <clientplatform@workiva.com>
+  - Evan Weible <evan.weible@workiva.com>
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
