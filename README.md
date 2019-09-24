@@ -66,7 +66,7 @@ Notes:
 ## Contributing
 
 * `dartanalyzer .`
-* `dartfmt -n --set-exit-if-changed .`
+* `dartfmt -w .`
 * `pub run test`
 
 If you make changes to `lib/src/config.dart` and need to regenerate
