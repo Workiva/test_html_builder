@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      test_html_builder:
+        options:
+          templates:
+            "test/script_template.html":
+              - "test/script_test.dart"
+            "test/css_template.html":
+              - "test/css_test.dart"
