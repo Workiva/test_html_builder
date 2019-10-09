@@ -23,13 +23,12 @@ Create as many HTML test templates in the `test/` directory as needed, e.g.:
         <!-- Load custom assets needed by the test. -->
         <script src="custom.js"></script>
 
-        <!--
-        Every template must include this `{test}` token.
-        It will be replaced by the builder with the required tags:
+        <!-- Every template must include this token. -->
+        {test}
+        <!-- It will be replaced by the builder with the required tags:
         <link rel="x-dart-test" href="...">
         <script src="packages/test/dart.js"></script>
         -->
-        {test}
     </head>
 </html>
 ```

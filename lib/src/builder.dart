@@ -83,7 +83,7 @@ class TestHtmlBuilder implements Builder {
       return;
     }
 
-    htmlContents = htmlContents.replaceFirst(
+    htmlContents = htmlContents.replaceAll(
         '{test}',
         '<link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">'
             '<script src="packages/test/dart.js"></script>');
