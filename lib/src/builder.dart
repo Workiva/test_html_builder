@@ -23,6 +23,11 @@ const _outputExtension = '_test.html';
 
 final _log = Logger('TestHtmlBuilder');
 
+/// Builder that uses templates to generate HTML files for dart tests.
+///
+/// Useful for projects with many tests that require custom HTML. Instead of
+/// having to replicate the custom HTML file for every test file that requires
+/// it, this builder can apply a template to any number of test files.
 class TestHtmlBuilder implements Builder {
   TestHtmlBuilderConfig _config;
 
@@ -78,7 +83,7 @@ class TestHtmlBuilder implements Builder {
       return;
     }
 
-    htmlContents = htmlContents.replaceFirst(
+    htmlContents = htmlContents.replaceAll(
         '{test}',
         '<link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">'
             '<script src="packages/test/dart.js"></script>');
