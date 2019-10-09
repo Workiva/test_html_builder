@@ -18,6 +18,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:test_html_builder/src/builder.dart';
 import 'package:test_html_builder/src/config.dart';
 
+/// Builder factory referenced by this builder's build.yaml definition.
 TestHtmlBuilder testHtmlBuilder(BuilderOptions options) {
   try {
     final config = TestHtmlBuilderConfig.fromJson(options.config);
