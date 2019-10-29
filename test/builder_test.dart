@@ -95,12 +95,12 @@ void main() {
       await testBuilder(builder, {
         'a|test/bar_test.dart': '',
         'a|test/foo_test.dart': '',
-        'a|test/template.html': '<html><head>{test}</head></html>',
+        'a|test/template.html': '<html><head><title>{test_id}</title>{test}</head></html>',
       }, outputs: {
         'a|test/bar_test.html':
-            '''<html><head><link rel="x-dart-test" href="bar_test.dart"><script src="packages/test/dart.js"></script></head></html>''',
+            '''<html><head><title>bar_test</title><link rel="x-dart-test" href="bar_test.dart"><script src="packages/test/dart.js"></script></head></html>''',
         'a|test/foo_test.html':
-            '''<html><head><link rel="x-dart-test" href="foo_test.dart"><script src="packages/test/dart.js"></script></head></html>''',
+            '''<html><head><title>foo_test</title><link rel="x-dart-test" href="foo_test.dart"><script src="packages/test/dart.js"></script></head></html>''',
       });
     });
 

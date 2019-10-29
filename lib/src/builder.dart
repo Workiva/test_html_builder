@@ -38,6 +38,9 @@ class TestHtmlBuilder implements Builder {
     _inputExtension: [_outputExtension],
   };
 
+  static String getTestId(AssetId assetId) =>
+      assetId.changeExtension('').pathSegments.last;
+
   static AssetId getCustomHtmlId(AssetId assetId) =>
       assetId.changeExtension('.custom.html');
 
@@ -55,6 +58,7 @@ class TestHtmlBuilder implements Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
+    final testId = getTestId(buildStep.inputId);
     final htmlId = getHtmlId(buildStep.inputId);
     final customHtmlId = getCustomHtmlId(buildStep.inputId);
 
@@ -87,6 +91,10 @@ class TestHtmlBuilder implements Builder {
         '{test}',
         '<link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">'
             '<script src="packages/test/dart.js"></script>');
+
+    htmlContents = htmlContents.replaceAll(
+        '{test_id}',
+        '${testId}');
     await buildStep.writeAsString(htmlId, htmlContents);
   }
 }
