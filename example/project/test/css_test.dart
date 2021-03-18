@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 @TestOn('browser')
 import 'dart:html';
 
