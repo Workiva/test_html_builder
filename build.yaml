@@ -1,13 +1,70 @@
+targets:
+  $default:
+    sources:
+      include:
+        - lib/**
+
 builders:
   test_html_builder:
     import: "package:test_html_builder/builder.dart"
-    builder_factories: ["testHtmlBuilder"]
+    builder_factories:
+      - testHtmlBuilder
     build_extensions:
-      _test.dart:
-        - _test.html
+      $test$:
+        - test_html_builder_config.json
     auto_apply: root_package
     build_to: cache
     runs_before:
       - build_test|test_bootstrap
+      - test_html_builder|aggregator
+      - test_html_builder|dart_test_yaml
+      - test_html_builder|template
+    applies_builders:
+      - test_html_builder|aggregator
+      - test_html_builder|dart_test_yaml
+      - test_html_builder|templates
     defaults:
-      generate_for: ["test/**_test.dart"]
+      generate_for:
+        - test/**
+
+  test_html_builder|aggregator:
+    import: "package:test_html_builder/builder.dart"
+    builder_factories:
+      - aggregateTestBuilder
+    build_extensions:
+      _template.html:
+        - _template.dart2js_aggregate_test.dart
+    build_to: source
+    is_optional: true
+    runs_before:
+      - test_html_builder|templates
+      - build_test|test_bootstrap
+    defaults:
+      generate_for:
+        - test/**
+
+  test_html_builder|templates:
+    import: "package:test_html_builder/builder.dart"
+    builder_factories:
+      - templateBuilder
+    build_extensions:
+      _test.dart:
+        - _test.html
+    build_to: cache
+    defaults:
+      generate_for:
+        - test/**
+
+  test_html_builder|dart_test_yaml:
+    import: "package:test_html_builder/builder.dart"
+    builder_factories:
+      - dartTestYamlBuilder
+    build_extensions:
+      # TODO: once on latest Dart and build_runner, use this instead:
+      # $package$:
+      $test$:
+        - dart_test.dart2js_aggregate.yaml
+    build_to: source
+    defaults:
+      generate_for:
+        - test/**

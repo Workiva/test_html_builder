@@ -12,22 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// If changes are made to this class and regeneration is needed, uncomment the
+// json_annotation and json_serializable dependencies in pubspec.yaml, and then
+// comment out the test_html_builder definition in `build.yaml`.
+library lib.src.config;
+
+import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'config.g.dart';
 
-@JsonSerializable(
-    anyMap: true,
-    checked: true,
-    createToJson: false,
-    disallowUnrecognizedKeys: true)
+@JsonSerializable(anyMap: true, checked: true, disallowUnrecognizedKeys: true)
 class TestHtmlBuilderConfig {
-  TestHtmlBuilderConfig({Map<String, List<String>> templates})
-      : templates = templates ?? {};
+  TestHtmlBuilderConfig(
+      {bool aggregateForDart2js, Map<String, List<String>> templates})
+      : aggregateForDart2js = aggregateForDart2js ?? true,
+        templates = templates ?? {};
 
-  factory TestHtmlBuilderConfig.fromJson(Map<String, dynamic> json) =>
-      _$TestHtmlBuilderConfigFromJson(json);
+  factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
+    final config = TestHtmlBuilderConfig.fromJson(options.config);
+    for (final path in config.templates.keys) {
+      if (!path.startsWith('./test/') && !path.startsWith('test/')) {
+        throw StateError('Invalid template path: $path\n'
+            'Every test html template must be located in the `test/` directory.');
+      }
+    }
+    return config;
+  }
+
+  factory TestHtmlBuilderConfig.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$TestHtmlBuilderConfigFromJson(json);
+    } on CheckedFromJsonException catch (e) {
+      final lines = <String>[
+        'Could not parse the options provided for `test_html_builder`.'
+      ];
+
+      if (e.key != null) {
+        lines.add('There is a problem with "${e.key}".');
+      }
+      if (e.message != null) {
+        lines.add(e.message);
+      } else if (e.innerError != null) {
+        lines.add(e.innerError.toString());
+      }
+
+      throw StateError(lines.join('\n'));
+    }
+  }
+
+  final bool aggregateForDart2js;
 
   final Map<String, List<String>> templates;
 
@@ -38,4 +73,6 @@ class TestHtmlBuilderConfig {
   }
 
   Map<String, Iterable<Glob>> _templateGlobs;
+
+  Map<String, Object> toJson() => _$TestHtmlBuilderConfigToJson(this);
 }

@@ -1,0 +1,8 @@
+presets:
+  dart2js-aggregate:
+    platforms: [chrome]
+    paths:
+      - test/templates/css_template.dart2js_aggregate_test.dart
+      - test/templates/default_template.dart2js_aggregate_test.dart
+      - test/templates/script_template.dart2js_aggregate_test.dart
+      - test/unit/custom_html_test.dart
