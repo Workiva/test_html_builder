@@ -17,6 +17,8 @@ they must also include `<script src="packages/test/dart.js"></script>`.
     for this package to support projects that use a single HTML template via the
     test package's `custom_html_template_path` option.
 
+- Switch from Travis CI to a GitHub Workflow.
+
 ## 1.0.2
 
 - Fix #8.
