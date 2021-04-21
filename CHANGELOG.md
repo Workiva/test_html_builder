@@ -1,7 +1,25 @@
+## 2.0.0
+
+[dart2js-aggregation]: /README.md#testing-with-dart2js
+[test-package-custom-html]: https://github.com/dart-lang/test/tree/master/pkgs/test#running-tests-with-custom-html
+
+- Add a [dart2js aggregation feature][dart2js-aggregation] that automates the
+generation and running of aggregate tests for browser tests. In large projects
+with a lot of browser tests, this approach significantly speeds up the building
+of these tests with dart2js. See the readme for more info.
+
+- **Breaking:** Update HTML template expectations to match [those from the `test` package][test-package-custom-html].
+Templates must now have a `{{testScript}}` placeholder instead of `{test}` and
+they must also include `<script src="packages/test/dart.js"></script>`.
+
+    This allows projects that may have already been using custom HTML for tests
+    to more easily adopt this package. It also makes it possible in the future
+    for this package to support projects that use a single HTML template via the
+    test package's `custom_html_template_path` option.
+
 ## 1.0.2
 
 - Fix #8.
-
 - Address pub health/maintenance recommendations (add an example, add missing
   doc comments).
 

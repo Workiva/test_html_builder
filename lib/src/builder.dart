@@ -19,6 +19,10 @@ import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
+// This import is deprecated to discourage its use, but the build_test package
+// uses it for the same reason we're using it here. So if they choose to get rid
+// of this import, they'll presumably have a plan for a different way to
+// accomplish the same thing that we can use.
 // ignore: deprecated_member_use
 import 'package:test_core/backend.dart'
     show Metadata, Runtime, SuitePlatform, parseMetadata;
@@ -32,14 +36,32 @@ class TestHtmlBuilder implements Builder {
 
   @override
   final buildExtensions = {
-    r'$test$': ['test_html_builder_config.json']
+    r'$test$': [
+      'templates/default_template.html',
+      'test_html_builder_config.json',
+    ]
   };
 
   @override
   Future<void> build(BuildStep buildStep) async {
+    // Write the default template for any browser tests that don't match one of
+    // the templates defined in the project's config.
+    final defaultTemplateId = AssetId(
+        buildStep.inputId.package, 'test/templates/default_template.html');
+    await buildStep.writeAsString(defaultTemplateId, '''<!doctype html>
+<html>
+  <head>
+    <title>{{testName}} Test</title>
+    {{testScript}}
+    <script src="packages/test/dart.js"></script>
+  </head>
+</html>
+''');
+
+    // Write the builder options so they can be used by the builders below.
     final configId = AssetId(
         buildStep.inputId.package, 'test/test_html_builder_config.json');
-    return buildStep.writeAsString(configId, json.encode(_config));
+    await buildStep.writeAsString(configId, json.encode(_config));
   }
 }
 
@@ -51,18 +73,32 @@ class AggregateTestBuilder extends Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
-    final templates = await _templates(buildStep);
+    _config ??= await decodeConfig(buildStep);
+    if (!_config.dart2jsAggregation) {
+      log.fine('dart2js aggregation disabled');
+      return;
+    }
 
     final templatePath = buildStep.inputId.path;
-    final testGlobs = templates[templatePath] ?? [];
+    final isDefault = templatePath == 'test/templates/default_template.html';
+    final testGlobs = isDefault
+        ? [Glob('test/**_test.dart')]
+        : _config.templateGlobs[templatePath] ?? [];
     log.fine(
         'Test globs found for template: ${buildStep.inputId}:\n${testGlobs.join('\n')}');
 
     final higherPrecedenceGlobs = <Glob>[];
-    for (final t in templates.keys) {
-      // Only templates defined before the current one take precedence.
-      if (t == templatePath) break;
-      higherPrecedenceGlobs.addAll(templates[t]);
+    if (isDefault) {
+      // For the default template, all defined globs are higher precedence.
+      for (final globs in _config.templateGlobs.values) {
+        higherPrecedenceGlobs.addAll(globs);
+      }
+    } else {
+      for (final t in _config.templateGlobs.keys) {
+        // Only templates defined before the current one take precedence.
+        if (t == templatePath) break;
+        higherPrecedenceGlobs.addAll(_config.templateGlobs[t]);
+      }
     }
 
     final imports = StringBuffer();
@@ -96,6 +132,9 @@ class AggregateTestBuilder extends Builder {
       }
     }
 
+    // Don't generate an empty aggregate test.
+    if (imports.isEmpty) return;
+
     final contents = DartFormatter().format('''@TestOn('browser')
 import 'package:test/test.dart';
 
@@ -127,6 +166,8 @@ $mains}
 
   bool _isBrowserTest(Metadata testMetadata) => _browserRuntimes
       .any((r) => testMetadata.testOn.evaluate(SuitePlatform(r)));
+
+  TestHtmlBuilderConfig _config;
 }
 
 /// Builder that uses templates to generate HTML files for dart tests.
@@ -175,8 +216,8 @@ class TemplateBuilder implements Builder {
       return;
     }
 
-    final templates = await _templates(buildStep);
-    final templateId = getTemplateId(templates, buildStep.inputId);
+    _config ??= await decodeConfig(buildStep);
+    final templateId = getTemplateId(_config.templateGlobs, buildStep.inputId);
     if (templateId == null) {
       return;
     }
@@ -188,19 +229,22 @@ class TemplateBuilder implements Builder {
     log.fine(
         'Generating html for ${buildStep.inputId.path} from template at ${templateId.path}');
     var htmlContents = await buildStep.readAsString(templateId);
-    if (!htmlContents.contains('{test}')) {
+    if ('{{testScript}}'.allMatches(htmlContents).length != 1) {
       log.severe(
-          'Test html template must contain a `{test}` token: ${templateId.path}');
+          'Test html template must contain exactly one `{{testScript}}` placeholder: ${templateId.path}');
       return;
     }
 
-    // TODO: support same template tag convention that pkg:test does - `{{testScript}}` and `{{testName}}`
-    htmlContents = htmlContents.replaceAll(
-        '{test}',
-        '<link rel="x-dart-test" href="${p.basename(buildStep.inputId.path)}">'
-            '<script src="packages/test/dart.js"></script>');
+    final scriptBase = htmlEscape.convert(p.basename(buildStep.inputId.path));
+    final link = '<link rel="x-dart-test" href="$scriptBase">';
+    final testName = htmlEscape.convert(buildStep.inputId.path);
+    htmlContents = htmlContents
+        .replaceFirst('{{testScript}}', link)
+        .replaceAll('{{testName}}', testName);
     await buildStep.writeAsString(htmlId, htmlContents);
   }
+
+  TestHtmlBuilderConfig _config;
 }
 
 class DartTestYamlBuilder extends Builder {
@@ -213,6 +257,11 @@ class DartTestYamlBuilder extends Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
+    if (!(await decodeConfig(buildStep)).dart2jsAggregation) {
+      log.fine('dart2js aggregation disabled');
+      return;
+    }
+
     log.fine('Building test/dart_test.dart2js_aggregate.yaml');
     final contents = StringBuffer()..writeln('''presets:
   dart2js-aggregate:
@@ -222,9 +271,11 @@ class DartTestYamlBuilder extends Builder {
     await for (final template
         in buildStep.findAssets(Glob('test/**_template.html'))) {
       log.fine('Found template: ${template.path}');
-      final templatePath =
-          template.changeExtension('.dart2js_aggregate_test.dart').path;
-      contents.writeln('      - $templatePath');
+      final testId = template.changeExtension('.dart2js_aggregate_test.dart');
+      // Do nothing if an aggregate test wasn't generated for this template.
+      // This can happen if a template's globs don't actually match any tests.
+      if (!await buildStep.canRead(testId)) continue;
+      contents.writeln('      - ${testId.path}');
     }
 
     await for (final customHtml
@@ -235,25 +286,15 @@ class DartTestYamlBuilder extends Builder {
       contents.writeln('      - $customTestPath');
     }
 
-    // TODO: find tests that can run in the browser but aren't included in any of the aggregate tests or custom tests
-
     final outputId = AssetId(
         buildStep.inputId.package, 'test/dart_test.dart2js_aggregate.yaml');
     await buildStep.writeAsString(outputId, contents.toString());
-
-    // TODO: when we can use $package$ instead of $test$, read and verify that dart_test.yaml includes this file and warn otherwise
   }
 }
 
-Future<Map<String, Iterable<Glob>>> _templates(BuildStep buildStep) async {
-  if (__templates == null) {
-    final id = AssetId(
-        buildStep.inputId.package, 'test/test_html_builder_config.json');
-    final contents = await buildStep.readAsString(id);
-    final config = TestHtmlBuilderConfig.fromJson(json.decode(contents));
-    __templates = config.templateGlobs;
-  }
-  return __templates;
+Future<TestHtmlBuilderConfig> decodeConfig(BuildStep buildStep) async {
+  final id =
+      AssetId(buildStep.inputId.package, 'test/test_html_builder_config.json');
+  final contents = await buildStep.readAsString(id);
+  return TestHtmlBuilderConfig.fromJson(json.decode(contents));
 }
-
-Map<String, Iterable<Glob>> __templates; // TODO: maybe bad to have this state

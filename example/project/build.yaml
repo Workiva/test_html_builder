@@ -3,10 +3,9 @@ targets:
     builders:
       test_html_builder:
         options:
+          dart2js_aggregation: true
           templates:
             "test/templates/script_template.html":
               - "test/unit/script_test.dart"
             "test/templates/css_template.html":
               - "test/unit/css_test.dart"
-            "test/templates/default_template.html":
-              - "test/unit/**_test.dart"

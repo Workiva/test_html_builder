@@ -11,6 +11,7 @@ builders:
       - testHtmlBuilder
     build_extensions:
       $test$:
+        - templates/default_template.html
         - test_html_builder_config.json
     auto_apply: root_package
     build_to: cache

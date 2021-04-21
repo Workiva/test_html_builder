@@ -23,11 +23,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'config.g.dart';
 
-@JsonSerializable(anyMap: true, checked: true, disallowUnrecognizedKeys: true)
+@JsonSerializable(
+    anyMap: true,
+    checked: true,
+    disallowUnrecognizedKeys: true,
+    fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool aggregateForDart2js, Map<String, List<String>> templates})
-      : aggregateForDart2js = aggregateForDart2js ?? true,
+      {bool dart2jsAggregation, Map<String, List<String>> templates})
+      : dart2jsAggregation = dart2jsAggregation ?? false,
         templates = templates ?? {};
 
   factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
@@ -62,7 +66,7 @@ class TestHtmlBuilderConfig {
     }
   }
 
-  final bool aggregateForDart2js;
+  final bool dart2jsAggregation;
 
   final Map<String, List<String>> templates;
 

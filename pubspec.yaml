@@ -13,10 +13,11 @@ environment:
   sdk: ">=2.3.0 <3.0.0"
 
 executables:
-  run_dart2js_aggregate_tests:
+  dart2js_aggregate_tests:
 
 dependencies:
   analyzer: ^0.39.0
+  args: ^1.6.0
   boolean_selector: ^2.0.0
   build: ^1.1.4
   build_config: ^0.4.2
