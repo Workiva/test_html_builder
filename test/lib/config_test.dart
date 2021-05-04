@@ -1,3 +1,4 @@
+@TestOn('vm')
 import 'package:build/build.dart';
 import 'package:test/test.dart';
 import 'package:test_html_builder/src/config.dart';
