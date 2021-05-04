@@ -10,14 +10,24 @@ final argParser = ArgParser()
       defaultsTo: false,
       help: 'Omits the --release flag to help with debugging.')
   ..addOption('mode',
-      allowed: ['args', 'run'],
+      allowed: ['args', 'build', 'test'],
       allowedHelp: {
         'args':
             'Print to stderr the build and test args needed to run dart2js aggregate tests.\n'
                 'Useful for integrating this into other test runners.',
-        'run': 'Build and run dart2js aggregate tests.',
+        'build': 'Build the dart2js aggregate tests.',
+        'test': 'Build and run dart2js aggregate tests.',
       },
-      defaultsTo: 'run');
+      defaultsTo: 'test');
+
+enum Mode {
+  // Print build and test args separated by `--`
+  args,
+  // Build dart2js aggregate tests in release mode
+  build,
+  // Build and run dart2js aggregate tests in release mode
+  test,
+}
 
 void main(List<String> args) async {
   final parsed = argParser.parse(args);
@@ -27,8 +37,19 @@ void main(List<String> args) async {
     return;
   }
 
-  final debugMode = (parsed['debug'] as bool) ?? false;
-  final argsMode = parsed['mode'] == 'args';
+  final debug = (parsed['debug'] as bool) ?? false;
+  Mode mode;
+  switch (parsed['mode']) {
+    case 'args':
+      mode = Mode.args;
+      break;
+    case 'build':
+      mode = Mode.build;
+      break;
+    default:
+      mode = Mode.test;
+      break;
+  }
 
   void logIf(bool condition, String msg) {
     if (!condition) return;
@@ -45,11 +66,11 @@ void main(List<String> args) async {
     'build',
     '--build-filter=test/dart_test.dart2js_aggregate.yaml'
   ];
-  logIf(!argsMode, 'Building dart2js aggregate test config...');
-  logIf(!argsMode, '$executable ${brArgs.join(' ')}');
+  logIf(mode != Mode.args, 'Building dart2js aggregate test config...');
+  logIf(mode != Mode.args, '$executable ${brArgs.join(' ')}');
   var result = Process.runSync(executable, brArgs);
-  logIf(
-      result.exitCode != 0 || !argsMode, '${result.stderr}\n${result.stdout}');
+  logIf(result.exitCode != 0 || mode != Mode.args,
+      '${result.stderr}\n${result.stdout}');
   if (result.exitCode != 0) {
     exitCode = result.exitCode;
     return;
@@ -57,8 +78,23 @@ void main(List<String> args) async {
 
   // Parse the generated test config to get the paths for each test that will be
   // run, so that we can generate the correct --build-filter args.
-  logIf(!argsMode, '\nReading dart2js aggregate test config...');
+  logIf(mode != Mode.args, '\nReading dart2js aggregate test config...');
   final configFile = File('test/dart_test.dart2js_aggregate.yaml');
+  if (!configFile.existsSync()) {
+    stdout
+        .writeln(r'''dart2js aggregation is not enabled. Update your build.yaml:
+
+# build.yaml
+targets:
+  $default:
+    builders:
+      test_html_builder:
+        options:
+          dart2js_aggregation: true''');
+    exitCode = 1;
+    return;
+  }
+
   final config =
       loadYaml(configFile.readAsStringSync(), sourceUrl: configFile.uri);
   List<String> paths;
@@ -72,29 +108,39 @@ void main(List<String> args) async {
     exitCode = 1;
     return;
   }
-  logIf(!argsMode, 'Found ${paths.length} aggregate tests to run.');
+  logIf(mode != Mode.args, 'Found ${paths.length} aggregate tests to run.');
 
   // Build tests in release mode with the right build filters so that only the
   // aggregate tests and supporting files are built, and then run tests with the
   // right preset so that only those aggregate tests run. For projects with a
   // lot of tests, this will be much faster than compiling each individual test
   // with dart2js.
-  final buildTestArgs = [
-    if (!debugMode) '--release',
+  final buildArgs = [
+    if (!debug) '--release',
     for (final path in paths) '--build-filter=${p.setExtension(path, '.**')}',
+  ];
+  final testArgs = [
     '--',
     '--preset=dart2js-aggregate',
   ];
 
-  if (argsMode) {
-    stdout.write(buildTestArgs.join(' '));
+  if (mode == Mode.args) {
+    stdout.write([...buildArgs, ...testArgs].join(' '));
     return;
   }
 
-  brArgs = ['run', 'build_runner', 'test', ...buildTestArgs];
+  brArgs = [
+    'run',
+    'build_runner',
+    if (mode == Mode.build) 'build',
+    if (mode == Mode.test) 'test',
+    ...buildArgs,
+    if (mode == Mode.test) ...testArgs,
+  ];
   stdout
     ..writeln()
-    ..writeln('Running aggregate dart2js tests...')
+    ..writeln(
+        '${mode == Mode.build ? 'Building' : 'Running'} aggregate dart2js tests...')
     ..writeln('$executable ${brArgs.join(' ')}');
   final process = await Process.start(executable, brArgs,
       mode: ProcessStartMode.inheritStdio);
