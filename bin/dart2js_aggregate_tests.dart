@@ -4,6 +4,8 @@ import 'package:args/args.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
+const testPreset = '--preset=dart2js-aggregate';
+
 final argParser = ArgParser()
   ..addFlag('help', abbr: 'h')
   ..addFlag('debug',
@@ -29,6 +31,11 @@ enum Mode {
   test,
 }
 
+void logIf(bool condition, String msg) {
+  if (!condition) return;
+  stdout.writeln(msg);
+}
+
 void main(List<String> args) async {
   final parsed = argParser.parse(args);
 
@@ -51,33 +58,44 @@ void main(List<String> args) async {
       break;
   }
 
-  void logIf(bool condition, String msg) {
-    if (!condition) return;
-    stdout.writeln(msg);
+  buildDart2jsAggregateTestYaml(mode);
+  final testPaths = parseAggregateTestPaths(mode);
+  if (mode == Mode.args) {
+    printArgs(testPaths, debug: debug);
+  } else {
+    await buildOrRunTests(mode, testPaths, debug: debug);
   }
+}
 
-  // Run a build with a filter for just the dart test config (which should be
-  // quick). We need this file to be up-to-date so we can build the correct
-  // command with build filters for each of the intended test paths.
+/// Run a build with a filter for just the dart test config (which should be
+/// quick).
+///
+/// We need this file to be up-to-date so we can build the correct command with
+/// build filters for each of the intended test paths.
+void buildDart2jsAggregateTestYaml(Mode mode) {
   var executable = 'pub';
-  var brArgs = [
+  var args = [
     'run',
     'build_runner',
     'build',
     '--build-filter=test/dart_test.dart2js_aggregate.yaml'
   ];
   logIf(mode != Mode.args, 'Building dart2js aggregate test config...');
-  logIf(mode != Mode.args, '$executable ${brArgs.join(' ')}');
-  var result = Process.runSync(executable, brArgs);
+  logIf(mode != Mode.args, '$executable ${args.join(' ')}');
+  var result = Process.runSync(executable, args);
   logIf(result.exitCode != 0 || mode != Mode.args,
       '${result.stderr}\n${result.stdout}');
   if (result.exitCode != 0) {
-    exitCode = result.exitCode;
-    return;
+    exit(result.exitCode);
   }
+}
 
-  // Parse the generated test config to get the paths for each test that will be
-  // run, so that we can generate the correct --build-filter args.
+/// Parse the generated test config to get the paths for each test that will be
+/// run, so that we can generate the correct --build-filter args.
+///
+/// Returns the list of paths for all aggregate tests, or exits early if they
+/// could not be parsed.
+List<String> parseAggregateTestPaths(Mode mode) {
   logIf(mode != Mode.args, '\nReading dart2js aggregate test config...');
   final configFile = File('test/dart_test.dart2js_aggregate.yaml');
   if (!configFile.existsSync()) {
@@ -91,8 +109,7 @@ targets:
       test_html_builder:
         options:
           dart2js_aggregation: true''');
-    exitCode = 1;
-    return;
+    exit(1);
   }
 
   final config =
@@ -105,44 +122,51 @@ targets:
       ..writeln('Failed to read test paths from "${configFile.uri}')
       ..writeln(e)
       ..writeln(stack);
-    exitCode = 1;
-    return;
+    exit(1);
   }
   logIf(mode != Mode.args, 'Found ${paths.length} aggregate tests to run.');
+  return paths;
+}
 
-  // Build tests in release mode with the right build filters so that only the
-  // aggregate tests and supporting files are built, and then run tests with the
-  // right preset so that only those aggregate tests run. For projects with a
-  // lot of tests, this will be much faster than compiling each individual test
-  // with dart2js.
-  final buildArgs = [
-    if (!debug) '--release',
-    for (final path in paths) '--build-filter=${p.setExtension(path, '.**')}',
-  ];
-  final testArgs = [
-    '--',
-    '--preset=dart2js-aggregate',
-  ];
+/// Returns a list of args to be passed to a build_runner command that will only
+/// build/run [tests].
+///
+/// The --release flag will be included unless [debug] is true.
+List<String> buildRunnerBuildArgs(List<String> testPaths, {bool debug}) => [
+      if (debug != true) '--release',
+      for (final path in testPaths)
+        '--build-filter=${p.setExtension(path, '.**')}',
+    ];
 
-  if (mode == Mode.args) {
-    stdout.write([...buildArgs, ...testArgs].join(' '));
-    return;
-  }
-
-  brArgs = [
+/// Depending on [mode], either builds or builds and runs the aggregate tests
+/// using [buildArgs] and [testArgs].
+Future<void> buildOrRunTests(Mode mode, List<String> testPaths,
+    {bool debug}) async {
+  final executable = 'pub';
+  final args = [
     'run',
     'build_runner',
     if (mode == Mode.build) 'build',
     if (mode == Mode.test) 'test',
-    ...buildArgs,
-    if (mode == Mode.test) ...testArgs,
+    ...buildRunnerBuildArgs(testPaths, debug: debug),
+    if (mode == Mode.test) ...['--', testPreset],
   ];
   stdout
     ..writeln()
     ..writeln(
         '${mode == Mode.build ? 'Building' : 'Running'} aggregate dart2js tests...')
-    ..writeln('$executable ${brArgs.join(' ')}');
-  final process = await Process.start(executable, brArgs,
+    ..writeln('$executable ${args.join(' ')}');
+  final process = await Process.start(executable, args,
       mode: ProcessStartMode.inheritStdio);
   exitCode = await process.exitCode;
+}
+
+/// Prints the build and test args separated by `--` needed to build or run the
+/// dart2js aggregate tests.
+void printArgs(List<String> testPaths, {bool debug}) {
+  stdout.write([
+    ...buildRunnerBuildArgs(testPaths, debug: debug),
+    '--',
+    testPreset,
+  ].join(' '));
 }
