@@ -120,7 +120,7 @@ targets:
     paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
   } catch (e, stack) {
     stdout
-      ..writeln('Failed to read test paths from "${configFile.uri}')
+      ..writeln('Failed to read test paths from "${configFile.uri}"')
       ..writeln(e)
       ..writeln(stack);
     exit(1);
