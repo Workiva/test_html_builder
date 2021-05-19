@@ -268,13 +268,9 @@ class DartTestYamlBuilder extends Builder {
     platforms: [chrome]
     paths:''');
 
-    await for (final template
-        in buildStep.findAssets(Glob('test/**_template.html'))) {
-      log.fine('Found template: ${template.path}');
-      final testId = template.changeExtension('.browser_aggregate_test.dart');
-      // Do nothing if an aggregate test wasn't generated for this template.
-      // This can happen if a template's globs don't actually match any tests.
-      if (!await buildStep.canRead(testId)) continue;
+    final aggregateTests = buildStep.findAssets(Glob('test/**_template.browser_aggregate_test.dart'));
+    await for (final testId in aggregateTests) {
+      log.fine('Found aggregate test: ${testId.path}');
       contents.writeln('      - ${testId.path}');
     }
 
