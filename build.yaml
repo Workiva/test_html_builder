@@ -34,7 +34,7 @@ builders:
       - aggregateTestBuilder
     build_extensions:
       _template.html:
-        - _template.dart2js_aggregate_test.dart
+        - _template.browser_aggregate_test.dart
     build_to: source
     is_optional: true
     runs_before:
@@ -64,7 +64,7 @@ builders:
       # TODO: once on latest Dart and build_runner, use this instead:
       # $package$:
       $test$:
-        - dart_test.dart2js_aggregate.yaml
+        - dart_test.browser_aggregate.yaml
     build_to: source
     defaults:
       generate_for:

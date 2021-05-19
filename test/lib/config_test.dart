@@ -8,19 +8,19 @@ void main() {
     test('with default values', () {
       final options = BuilderOptions({});
       final config = TestHtmlBuilderConfig.fromBuilderOptions(options);
-      expect(config.dart2jsAggregation, isFalse);
+      expect(config.browserAggregation, isFalse);
       expect(config.templateGlobs, isEmpty);
     });
 
     test('with overrides', () {
       final options = BuilderOptions({
-        'dart2js_aggregation': true,
+        'browser_aggregation': true,
         'templates': {
           'test/foo_template.html': ['test/**_test.dart'],
         }
       });
       final config = TestHtmlBuilderConfig.fromBuilderOptions(options);
-      expect(config.dart2jsAggregation, isTrue);
+      expect(config.browserAggregation, isTrue);
       expect(config.templates, {
         'test/foo_template.html': ['test/**_test.dart'],
       });

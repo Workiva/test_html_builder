@@ -3,7 +3,7 @@ targets:
     builders:
       test_html_builder:
         options:
-          dart2js_aggregation: true
+          browser_aggregation: true
           templates:
             "test/templates/script_template.html":
               - "test/unit/script_test.dart"

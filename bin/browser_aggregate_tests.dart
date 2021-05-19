@@ -4,30 +4,29 @@ import 'package:args/args.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
-const testPreset = '--preset=dart2js-aggregate';
+const testPreset = '--preset=browser-aggregate';
 
 final argParser = ArgParser()
   ..addFlag('help', abbr: 'h')
-  ..addFlag('debug',
-      defaultsTo: false,
-      help: 'Omits the --release flag to help with debugging.')
+  ..addFlag('release',
+      defaultsTo: false, help: 'Build in release mode (dart2js).')
   ..addOption('mode',
       allowed: ['args', 'build', 'test'],
       allowedHelp: {
         'args':
-            'Print to stderr the build and test args needed to run dart2js aggregate tests.\n'
+            'Print to stderr the build and test args needed to run browser aggregate tests.\n'
                 'Useful for integrating this into other test runners.',
-        'build': 'Build the dart2js aggregate tests.',
-        'test': 'Build and run dart2js aggregate tests.',
+        'build': 'Build the browser aggregate tests.',
+        'test': 'Build and run browser aggregate tests.',
       },
       defaultsTo: 'test');
 
 enum Mode {
   // Print build and test args separated by `--`
   args,
-  // Build dart2js aggregate tests in release mode
+  // Build browser aggregate tests
   build,
-  // Build and run dart2js aggregate tests in release mode
+  // Build and run browser aggregate tests
   test,
 }
 
@@ -44,7 +43,7 @@ void main(List<String> args) async {
     return;
   }
 
-  final debug = (parsed['debug'] as bool) ?? false;
+  final release = (parsed['release'] as bool) ?? false;
   Mode mode;
   switch (parsed['mode']) {
     case 'args':
@@ -58,12 +57,14 @@ void main(List<String> args) async {
       break;
   }
 
-  buildDart2jsAggregateTestYaml(mode);
+  buildAggregateTestYaml(mode);
   final testPaths = parseAggregateTestPaths(mode);
   if (mode == Mode.args) {
-    printArgs(testPaths, debug: debug);
+    printArgs(testPaths, release: release);
+  } else if (mode == Mode.build) {
+    await buildTests(testPaths, release: release);
   } else {
-    await buildOrRunTests(mode, testPaths, debug: debug);
+    await runTests(testPaths, release: release);
   }
 }
 
@@ -72,15 +73,15 @@ void main(List<String> args) async {
 ///
 /// We need this file to be up-to-date so we can build the correct command with
 /// build filters for each of the intended test paths.
-void buildDart2jsAggregateTestYaml(Mode mode) {
+void buildAggregateTestYaml(Mode mode) {
   var executable = 'pub';
   var args = [
     'run',
     'build_runner',
     'build',
-    '--build-filter=test/dart_test.dart2js_aggregate.yaml'
+    '--build-filter=test/dart_test.browser_aggregate.yaml'
   ];
-  logIf(mode != Mode.args, 'Building dart2js aggregate test config...');
+  logIf(mode != Mode.args, 'Building browser aggregate test config...');
   logIf(mode != Mode.args, '$executable ${args.join(' ')}');
   var result = Process.runSync(executable, args);
   logIf(result.exitCode != 0 || mode != Mode.args,
@@ -96,11 +97,11 @@ void buildDart2jsAggregateTestYaml(Mode mode) {
 /// Returns the list of paths for all aggregate tests, or exits early if they
 /// could not be parsed.
 List<String> parseAggregateTestPaths(Mode mode) {
-  logIf(mode != Mode.args, '\nReading dart2js aggregate test config...');
-  final configFile = File('test/dart_test.dart2js_aggregate.yaml');
+  logIf(mode != Mode.args, '\nReading browser aggregate test config...');
+  final configFile = File('test/dart_test.browser_aggregate.yaml');
   if (!configFile.existsSync()) {
     stdout
-        .writeln(r'''dart2js aggregation is not enabled. Update your build.yaml:
+        .writeln(r'''browser aggregation is not enabled. Update your build.yaml:
 
 # build.yaml
 targets:
@@ -108,7 +109,7 @@ targets:
     builders:
       test_html_builder:
         options:
-          dart2js_aggregation: true''');
+          browser_aggregation: true''');
     exit(1);
   }
 
@@ -116,7 +117,7 @@ targets:
       loadYaml(configFile.readAsStringSync(), sourceUrl: configFile.uri);
   List<String> paths;
   try {
-    paths = List<String>.from(config['presets']['dart2js-aggregate']['paths']);
+    paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
   } catch (e, stack) {
     stdout
       ..writeln('Failed to read test paths from "${configFile.uri}')
@@ -131,30 +132,49 @@ targets:
 /// Returns a list of args to be passed to a build_runner command that will only
 /// build/run [tests].
 ///
-/// The --release flag will be included unless [debug] is true.
-List<String> buildRunnerBuildArgs(List<String> testPaths, {bool debug}) => [
-      if (debug != true) '--release',
+/// The --release flag will be included if [release] is true.
+List<String> buildRunnerBuildArgs(List<String> testPaths, {bool release}) => [
+      if (release ?? false) '--release',
       for (final path in testPaths)
         '--build-filter=${p.setExtension(path, '.**')}',
     ];
 
-/// Depending on [mode], either builds or builds and runs the aggregate tests
-/// using [buildArgs] and [testArgs].
-Future<void> buildOrRunTests(Mode mode, List<String> testPaths,
-    {bool debug}) async {
+/// Builds aggregate tests at [testPaths].
+///
+/// Includes `--release` if [release] is true.
+Future<void> buildTests(List<String> testPaths, {bool release}) async {
   final executable = 'pub';
   final args = [
     'run',
     'build_runner',
-    if (mode == Mode.build) 'build',
-    if (mode == Mode.test) 'test',
-    ...buildRunnerBuildArgs(testPaths, debug: debug),
-    if (mode == Mode.test) ...['--', testPreset],
+    'build',
+    ...buildRunnerBuildArgs(testPaths, release: release),
   ];
   stdout
     ..writeln()
-    ..writeln(
-        '${mode == Mode.build ? 'Building' : 'Running'} aggregate dart2js tests...')
+    ..writeln('Building browser aggregate tests...')
+    ..writeln('$executable ${args.join(' ')}');
+  final process = await Process.start(executable, args,
+      mode: ProcessStartMode.inheritStdio);
+  exitCode = await process.exitCode;
+}
+
+/// Builds and runs aggregate tests at [testPaths].
+///
+/// Includes `--release` if [release] is true.
+Future<void> runTests(List<String> testPaths, {bool release}) async {
+  final executable = 'pub';
+  final args = [
+    'run',
+    'build_runner',
+    'test',
+    ...buildRunnerBuildArgs(testPaths, release: release),
+    '--',
+    testPreset,
+  ];
+  stdout
+    ..writeln()
+    ..writeln('Running browser aggregate tests...')
     ..writeln('$executable ${args.join(' ')}');
   final process = await Process.start(executable, args,
       mode: ProcessStartMode.inheritStdio);
@@ -162,10 +182,10 @@ Future<void> buildOrRunTests(Mode mode, List<String> testPaths,
 }
 
 /// Prints the build and test args separated by `--` needed to build or run the
-/// dart2js aggregate tests.
-void printArgs(List<String> testPaths, {bool debug}) {
+/// browser aggregate tests.
+void printArgs(List<String> testPaths, {bool release}) {
   stdout.write([
-    ...buildRunnerBuildArgs(testPaths, debug: debug),
+    ...buildRunnerBuildArgs(testPaths, release: release),
     '--',
     testPreset,
   ].join(' '));

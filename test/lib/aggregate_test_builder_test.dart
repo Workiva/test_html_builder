@@ -8,7 +8,7 @@ import 'package:test_html_builder/src/config.dart';
 
 void main() {
   group('AggregateTestBuilder', () {
-    test('does nothing if dart2js aggregate not enabled', () async {
+    test('does nothing if browser aggregate not enabled', () async {
       final config = TestHtmlBuilderConfig(templates: {
         'test/foo_template.html': ['test/foo_test.dart'],
       });
@@ -22,7 +22,7 @@ void main() {
 
     test('generates an aggregate test for each template', () async {
       final config =
-          TestHtmlBuilderConfig(dart2jsAggregation: true, templates: {
+          TestHtmlBuilderConfig(browserAggregation: true, templates: {
         'test/templates/foo_template.html': ['test/foo_test.dart'],
         'test/templates/bar_template.html': ['test/bar_test.dart'],
       });
@@ -35,7 +35,7 @@ void main() {
         'a|test/templates/foo_template.html': '',
         'a|test/templates/bar_template.html': '',
       }, outputs: {
-        'a|test/templates/foo_template.dart2js_aggregate_test.dart':
+        'a|test/templates/foo_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
@@ -45,7 +45,7 @@ void main() {
   foo_test.main();
 }
 ''',
-        'a|test/templates/bar_template.dart2js_aggregate_test.dart':
+        'a|test/templates/bar_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
@@ -60,7 +60,7 @@ void main() {
 
     test('generates a default aggregate test for browser tests', () async {
       final config =
-          TestHtmlBuilderConfig(dart2jsAggregation: true, templates: {
+          TestHtmlBuilderConfig(browserAggregation: true, templates: {
         'test/templates/foo_template.html': ['test/foo_test.dart'],
         'test/templates/bar_template.html': ['test/bar_test.dart'],
       });
@@ -73,7 +73,7 @@ void main() {
         'a|test/vm_test.dart': "@TestOn('vm') library vm_test;",
         'a|test/other_test.dart': '',
       }, outputs: {
-        'a|test/templates/default_template.dart2js_aggregate_test.dart':
+        'a|test/templates/default_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
@@ -88,7 +88,7 @@ void main() {
 
     test('if multiple templates match, chooses first one', () async {
       final config =
-          TestHtmlBuilderConfig(dart2jsAggregation: true, templates: {
+          TestHtmlBuilderConfig(browserAggregation: true, templates: {
         'test/templates/foo_template.html': ['test/**_test.dart'],
         'test/templates/bar_template.html': ['test/**_test.dart'],
       });
@@ -100,7 +100,7 @@ void main() {
         'a|test/templates/foo_template.html': '',
         'a|test/templates/bar_template.html': '',
       }, outputs: {
-        'a|test/templates/foo_template.dart2js_aggregate_test.dart':
+        'a|test/templates/foo_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 

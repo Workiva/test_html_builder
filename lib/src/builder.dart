@@ -68,14 +68,14 @@ class TestHtmlBuilder implements Builder {
 class AggregateTestBuilder extends Builder {
   @override
   final buildExtensions = const {
-    '_template.html': ['_template.dart2js_aggregate_test.dart'],
+    '_template.html': ['_template.browser_aggregate_test.dart'],
   };
 
   @override
   Future<void> build(BuildStep buildStep) async {
     _config ??= await decodeConfig(buildStep);
-    if (!_config.dart2jsAggregation) {
-      log.fine('dart2js aggregation disabled');
+    if (!_config.browserAggregation) {
+      log.fine('browser aggregation disabled');
       return;
     }
 
@@ -144,7 +144,7 @@ $mains}
 ''');
 
     final outputId =
-        buildStep.inputId.changeExtension('.dart2js_aggregate_test.dart');
+        buildStep.inputId.changeExtension('.browser_aggregate_test.dart');
     await buildStep.writeAsString(outputId, contents);
   }
 
@@ -190,9 +190,9 @@ class TemplateBuilder implements Builder {
 
   AssetId getTemplateId(
       Map<String, Iterable<Glob>> templates, AssetId assetId) {
-    if (assetId.path.endsWith('.dart2js_aggregate_test.dart')) {
+    if (assetId.path.endsWith('.browser_aggregate_test.dart')) {
       return AssetId(assetId.package,
-          assetId.path.replaceFirst('.dart2js_aggregate_test.dart', '.html'));
+          assetId.path.replaceFirst('.browser_aggregate_test.dart', '.html'));
     }
 
     for (final templatePath in templates.keys) {
@@ -251,27 +251,27 @@ class DartTestYamlBuilder extends Builder {
   @override
   final buildExtensions = const {
     // TODO: once on latest Dart and build_runner, use this:
-    // r'$package$': ['dart_test.dart2js_aggregate.yaml'],
-    r'$test$': ['dart_test.dart2js_aggregate.yaml'],
+    // r'$package$': ['dart_test.browser_aggregate.yaml'],
+    r'$test$': ['dart_test.browser_aggregate.yaml'],
   };
 
   @override
   Future<void> build(BuildStep buildStep) async {
-    if (!(await decodeConfig(buildStep)).dart2jsAggregation) {
-      log.fine('dart2js aggregation disabled');
+    if (!(await decodeConfig(buildStep)).browserAggregation) {
+      log.fine('browser aggregation disabled');
       return;
     }
 
-    log.fine('Building test/dart_test.dart2js_aggregate.yaml');
+    log.fine('Building test/dart_test.browser_aggregate.yaml');
     final contents = StringBuffer()..writeln('''presets:
-  dart2js-aggregate:
+  browser-aggregate:
     platforms: [chrome]
     paths:''');
 
     await for (final template
         in buildStep.findAssets(Glob('test/**_template.html'))) {
       log.fine('Found template: ${template.path}');
-      final testId = template.changeExtension('.dart2js_aggregate_test.dart');
+      final testId = template.changeExtension('.browser_aggregate_test.dart');
       // Do nothing if an aggregate test wasn't generated for this template.
       // This can happen if a template's globs don't actually match any tests.
       if (!await buildStep.canRead(testId)) continue;
@@ -287,7 +287,7 @@ class DartTestYamlBuilder extends Builder {
     }
 
     final outputId = AssetId(
-        buildStep.inputId.package, 'test/dart_test.dart2js_aggregate.yaml');
+        buildStep.inputId.package, 'test/dart_test.browser_aggregate.yaml');
     await buildStep.writeAsString(outputId, contents.toString());
   }
 }

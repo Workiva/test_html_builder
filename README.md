@@ -84,7 +84,7 @@ result in the following (hidden) generated outputs:
   - `test/example_test.dart`
   - `test/example_test.custom.html`
 
-## Testing with dart2js
+## Aggregating Browser Tests
 
 Some projects would like additional assurance in a more production-like
 environment. This is typically done by running browser tests in release mode
@@ -106,7 +106,7 @@ that only the aggregate tests are compiled and run; otherwise, you might still
 be spending a bunch of time compiling all of the individual tests unnecessarily.
 
 The builder provided by this package can automate all of this! First, enable
-this functionality by setting `dart2js_aggregation: true`:
+this functionality by setting `browser_aggregation: true`:
 
 ```yaml
 targets:
@@ -119,27 +119,27 @@ targets:
               - "test/components/styled/**_test.dart"
             "test/react_template.html":
               - "test/components/**_test.dart"
-          dart2js_aggregation: true
+          browser_aggregation: true
 ```
 
 Once enabled, the builder will generate an aggregate test for each template that
 imports and runs each test that uses the template. It will also generate a
 default aggregate test for browser tests that don't match any of the templates.
-Finally, it generates a `test/dart_test.dart2js_aggregate.yaml` file that can be
+Finally, it generates a `test/dart_test.browser_aggregate.yaml` file that can be
 included in your project's `dart_test.yaml` so that the aggregate tests can be
-easily selected with this test argument: `--preset=dart2js-aggregate`
+easily selected with this test argument: `--preset=browser-aggregate`
 
 To run these tests, you can use the executable provided by this package:
 
 ```
-pub run test_html_builder:dart2js_aggregate_tests
+pub run test_html_builder:browser_aggregate_tests [--release]
 ```
 
 Or, if you have your own test runner that you'd like to integrate this
 functionality into, you can run:
 
 ```
-pub run test_html_builder:dart2js_aggregate_tests --mode=args
+pub run test_html_builder:browser_aggregate_tests --mode=args [--release]
 ```
 
 which will print the necessary build_runner and test args in this format:
@@ -148,13 +148,13 @@ which will print the necessary build_runner and test args in this format:
 <build args> -- <test args>
 
 # For example:
---release --build-filter=test/templates/react_template.dart2js_aggregate_test.** -- --preset=dart2js-aggregate
+--release --build-filter=test/templates/react_template.browser_aggregate_test.** -- --preset=browser-aggregate
 ```
 
 You can parse these or pass them directly into a command to run tests, like so:
 
 ```bash
-pub run build_runner test $(pub run test_html_builder:dart2js_aggregate_tests --mode=args)
+pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
 ```
 
 ## Contributing

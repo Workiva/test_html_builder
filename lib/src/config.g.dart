@@ -8,10 +8,10 @@ part of lib.src.config;
 
 TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
   return $checkedNew('TestHtmlBuilderConfig', json, () {
-    $checkKeys(json, allowedKeys: const ['dart2js_aggregation', 'templates']);
+    $checkKeys(json, allowedKeys: const ['browser_aggregation', 'templates']);
     final val = TestHtmlBuilderConfig(
-      dart2jsAggregation:
-          $checkedConvert(json, 'dart2js_aggregation', (v) => v as bool),
+      browserAggregation:
+          $checkedConvert(json, 'browser_aggregation', (v) => v as bool),
       templates: $checkedConvert(
           json,
           'templates',
@@ -21,12 +21,12 @@ TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
               )),
     );
     return val;
-  }, fieldKeyMap: const {'dart2jsAggregation': 'dart2js_aggregation'});
+  }, fieldKeyMap: const {'browserAggregation': 'browser_aggregation'});
 }
 
 Map<String, dynamic> _$TestHtmlBuilderConfigToJson(
         TestHtmlBuilderConfig instance) =>
     <String, dynamic>{
-      'dart2js_aggregation': instance.dart2jsAggregation,
+      'browser_aggregation': instance.browserAggregation,
       'templates': instance.templates,
     };

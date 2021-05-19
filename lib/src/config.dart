@@ -30,8 +30,8 @@ part 'config.g.dart';
     fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool dart2jsAggregation, Map<String, List<String>> templates})
-      : dart2jsAggregation = dart2jsAggregation ?? false,
+      {bool browserAggregation, Map<String, List<String>> templates})
+      : browserAggregation = browserAggregation ?? false,
         templates = templates ?? {};
 
   factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
@@ -66,7 +66,7 @@ class TestHtmlBuilderConfig {
     }
   }
 
-  final bool dart2jsAggregation;
+  final bool browserAggregation;
 
   final Map<String, List<String>> templates;
 
