@@ -1,2 +1,6 @@
 platforms:
   - chrome
+paths:
+  - test/unit/
+
+include: test/dart_test.browser_aggregate.yaml

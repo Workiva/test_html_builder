@@ -3,8 +3,9 @@ targets:
     builders:
       test_html_builder:
         options:
+          browser_aggregation: true
           templates:
-            "test/script_template.html":
-              - "test/script_test.dart"
-            "test/css_template.html":
-              - "test/css_test.dart"
+            "test/templates/script_template.html":
+              - "test/unit/script_test.dart"
+            "test/templates/css_template.html":
+              - "test/unit/css_test.dart"
