@@ -268,7 +268,8 @@ class DartTestYamlBuilder extends Builder {
     platforms: [chrome]
     paths:''');
 
-    final aggregateTests = buildStep.findAssets(Glob('test/**_template.browser_aggregate_test.dart'));
+    final aggregateTests = buildStep
+        .findAssets(Glob('test/**_template.browser_aggregate_test.dart'));
     await for (final testId in aggregateTests) {
       log.fine('Found aggregate test: ${testId.path}');
       contents.writeln('      - ${testId.path}');

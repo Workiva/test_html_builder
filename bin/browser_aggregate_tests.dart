@@ -19,7 +19,11 @@ final argParser = ArgParser()
         'build': 'Build the browser aggregate tests.',
         'test': 'Build and run browser aggregate tests.',
       },
-      defaultsTo: 'test');
+      defaultsTo: 'test')
+  ..addOption('build-args',
+      help: 'Args to pass to the build runner process.\n'
+          'Run "pub run build_runner build -h -v" to see all available '
+          'options.');
 
 enum Mode {
   // Print build and test args separated by `--`
@@ -43,7 +47,6 @@ void main(List<String> args) async {
     return;
   }
 
-  final release = (parsed['release'] as bool) ?? false;
   Mode mode;
   switch (parsed['mode']) {
     case 'args':
@@ -57,14 +60,17 @@ void main(List<String> args) async {
       break;
   }
 
-  buildAggregateTestYaml(mode);
+  final bool release = parsed['release'];
+  final String buildArgs = parsed['build-args'];
+
+  buildAggregateTestYaml(mode, userBuildArgs: buildArgs);
   final testPaths = parseAggregateTestPaths(mode);
   if (mode == Mode.args) {
-    printArgs(testPaths, release: release);
+    printArgs(testPaths);
   } else if (mode == Mode.build) {
-    await buildTests(testPaths, release: release);
+    await buildTests(testPaths, release: release, userBuildArgs: buildArgs);
   } else {
-    await runTests(testPaths, release: release);
+    await runTests(testPaths, release: release, userBuildArgs: buildArgs);
   }
 }
 
@@ -73,12 +79,22 @@ void main(List<String> args) async {
 ///
 /// We need this file to be up-to-date so we can build the correct command with
 /// build filters for each of the intended test paths.
-void buildAggregateTestYaml(Mode mode) {
+///
+/// [userBuildArgs] is interpreted as a space delimited string of additional
+/// build_runner build arguments and will also be included.
+void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
   var executable = 'pub';
   var args = [
     'run',
     'build_runner',
     'build',
+    // Because the builder triggered by this build writes files to source,
+    // and we expect those files to be checked in, we will always need to
+    // include --delete-conflicting-outputs.
+    '--delete-conflicting-outputs',
+    // Users may also supply additional build arguments. For example, some
+    // repos may need to specify a custom build.yaml file to be used.
+    ...?userBuildArgs?.split(' '),
     '--build-filter=test/dart_test.browser_aggregate.yaml'
   ];
   logIf(mode != Mode.args, 'Building browser aggregate test config...');
@@ -133,7 +149,13 @@ targets:
 /// build/run [tests].
 ///
 /// The --release flag will be included if [release] is true.
-List<String> buildRunnerBuildArgs(List<String> testPaths, {bool release}) => [
+///
+/// [userBuildArgs] is interpreted as a space delimited string of additional
+/// build_runner build arguments and will also be included.
+List<String> buildRunnerBuildArgs(List<String> testPaths,
+        {bool release, String userBuildArgs}) =>
+    [
+      ...?userBuildArgs?.split(' '),
       if (release ?? false) '--release',
       for (final path in testPaths)
         '--build-filter=${p.setExtension(path, '.**')}',
@@ -142,13 +164,15 @@ List<String> buildRunnerBuildArgs(List<String> testPaths, {bool release}) => [
 /// Builds aggregate tests at [testPaths].
 ///
 /// Includes `--release` if [release] is true.
-Future<void> buildTests(List<String> testPaths, {bool release}) async {
+Future<void> buildTests(List<String> testPaths,
+    {bool release, String userBuildArgs}) async {
   final executable = 'pub';
   final args = [
     'run',
     'build_runner',
     'build',
-    ...buildRunnerBuildArgs(testPaths, release: release),
+    ...buildRunnerBuildArgs(testPaths,
+        release: release, userBuildArgs: userBuildArgs),
   ];
   stdout
     ..writeln()
@@ -162,13 +186,15 @@ Future<void> buildTests(List<String> testPaths, {bool release}) async {
 /// Builds and runs aggregate tests at [testPaths].
 ///
 /// Includes `--release` if [release] is true.
-Future<void> runTests(List<String> testPaths, {bool release}) async {
+Future<void> runTests(List<String> testPaths,
+    {bool release, String userBuildArgs}) async {
   final executable = 'pub';
   final args = [
     'run',
     'build_runner',
     'test',
-    ...buildRunnerBuildArgs(testPaths, release: release),
+    ...buildRunnerBuildArgs(testPaths,
+        release: release, userBuildArgs: userBuildArgs),
     '--',
     testPreset,
   ];
@@ -183,9 +209,9 @@ Future<void> runTests(List<String> testPaths, {bool release}) async {
 
 /// Prints the build and test args separated by `--` needed to build or run the
 /// browser aggregate tests.
-void printArgs(List<String> testPaths, {bool release}) {
+void printArgs(List<String> testPaths) {
   stdout.write([
-    ...buildRunnerBuildArgs(testPaths, release: release),
+    ...buildRunnerBuildArgs(testPaths),
     '--',
     testPreset,
   ].join(' '));

@@ -6,8 +6,10 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 import 'package:test_process/test_process.dart';
 
 void main() {
-  Future<String> createProject({bool browserAggregation}) async {
+  Future<String> createProject(
+      {bool browserAggregation, bool customBuildYaml}) async {
     browserAggregation ??= true;
+    customBuildYaml ??= false;
     await d.dir('pkg', [
       d.file('pubspec.yaml', '''name: pkg
 environment:
@@ -20,7 +22,8 @@ dev_dependencies:
   test_html_builder:
     path: ${p.current}
 '''),
-      if (browserAggregation) d.file('build.yaml', '''targets:
+      if (browserAggregation)
+        d.file(customBuildYaml ? 'build.custom.yaml' : 'build.yaml', '''targets:
   \$default:
     builders:
       test_html_builder:
@@ -65,6 +68,20 @@ void main() {
     await process.shouldExit(0);
   });
 
+  test('--mode=args --release --build-args="-c custom"', () async {
+    final dir = await createProject(customBuildYaml: true);
+    final process = await testBrowserAggregateExecutable(
+        ['--mode=args', '--release', '--build-args', '-c custom'],
+        workingDirectory: dir);
+    expect(
+        process.stdout,
+        emitsInOrder([
+          '--build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate',
+          emitsDone
+        ]));
+    await process.shouldExit(0);
+  });
+
   test('--mode=build', () async {
     final dir = await createProject();
     final process = await testBrowserAggregateExecutable(['--mode=build'],
@@ -74,12 +91,33 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'pub run build_runner build --delete-conflicting-outputs --build-filter=test/dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
               'pub run build_runner build --build-filter=test/templates/default_template.browser_aggregate_test.**'),
+          emitsThrough(contains('Succeeded')),
+        ]));
+    await process.shouldExit(0);
+  });
+
+  test('--mode=build --release --build-args="-c custom"', () async {
+    final dir = await createProject(customBuildYaml: true);
+    final process = await testBrowserAggregateExecutable(
+        ['--mode=build', '--release', '--build-args', '-c custom'],
+        workingDirectory: dir);
+    expect(
+        process.stdout,
+        emitsInOrder([
+          emitsThrough('Building browser aggregate test config...'),
+          emitsThrough(
+              'pub run build_runner build --delete-conflicting-outputs -c custom --build-filter=test/dart_test.browser_aggregate.yaml'),
+          emitsThrough(contains('Succeeded')),
+          emitsThrough('Reading browser aggregate test config...'),
+          emitsThrough('Found 1 aggregate tests to run.'),
+          emitsThrough(
+              'pub run build_runner build -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**'),
           emitsThrough(contains('Succeeded')),
         ]));
     await process.shouldExit(0);
@@ -95,7 +133,7 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'pub run build_runner build --delete-conflicting-outputs --build-filter=test/dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
@@ -106,16 +144,24 @@ void main() {
     await process.shouldExit(0);
   });
 
-  test('release', () async {
-    final dir = await createProject();
+  test('--mode=test --build-args="--release -c custom"', () async {
+    final dir = await createProject(customBuildYaml: true);
+    // --mode=test is the default
     final process = await testBrowserAggregateExecutable(
-        ['--mode=args', '--release'],
+        ['--build-args', '--release -c custom'],
         workingDirectory: dir);
     expect(
         process.stdout,
         emitsInOrder([
-          '--release --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate',
-          emitsDone
+          emitsThrough('Building browser aggregate test config...'),
+          emitsThrough(
+              'pub run build_runner build --delete-conflicting-outputs --release -c custom --build-filter=test/dart_test.browser_aggregate.yaml'),
+          emitsThrough(contains('Succeeded')),
+          emitsThrough('Reading browser aggregate test config...'),
+          emitsThrough('Found 1 aggregate tests to run.'),
+          emitsThrough(
+              'pub run build_runner test --release -c custom --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
+          emitsThrough(contains('All tests passed!')),
         ]));
     await process.shouldExit(0);
   });
