@@ -13,7 +13,7 @@ builders:
       $test$:
         - templates/default_template.html
         - test_html_builder_config.json
-    auto_apply: root_package
+    auto_apply: dependents
     build_to: cache
     runs_before:
       - build_test|test_bootstrap

@@ -1,3 +1,10 @@
+## 2.1.1
+
+- Bug fix: change the `auto_apply` config for this builder from `root_package`
+to `dependents`. This ensures that the builder is automatically applied only to
+packages that directly depend on it. This fixes a scenario where an unexpected
+version of `test_html_builder` could be applied to the root package.
+
 ## 2.1.0
 
 - Add support for `--build-args` to the browser aggregation feature.
