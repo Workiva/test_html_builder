@@ -1,3 +1,11 @@
+## 2.1.0
+
+- Add support for `--build-args` to the browser aggregation feature.
+- Hardcode `--delete-conflicting-outputs` in the first `build_runner` command
+that is executed by the browser aggregation feature.
+- Update the "args" mode of the browser aggregation feature so it doesn't
+parrot back the build arguments it uses when running the build_runner.
+
 ## 2.0.0
 
 [browser-aggregation]: /README.md#aggregating-browser-tests
