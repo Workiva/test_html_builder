@@ -1,4 +1,4 @@
-## 2.0.1
+## 2.1.0
 
 - Add support for `--build-args` to the browser aggregation feature.
 - Hardcode `--delete-conflicting-outputs` in the first `build_runner` command
