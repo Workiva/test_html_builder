@@ -10,30 +10,24 @@ on:
       - '*'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        sdk: [stable, dev]
+        sdk: [ 2.7.2, stable, beta, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
-
-      - name: Print Dart SDK version
-        run: dart --version
-
-      - id: install
-        name: Install dependencies
-        run: dart pub get
-
-      - name: Analyze project source
-        run: dart analyze
-
+      - name: Install dependencies
+        run: pub get
+      - name: Validate dependencies
+        run: pub run dependency_validator
       - name: Check formatting
-        run: dart format --set-exit-if-changed .
-
+        run: dartfmt -w .
+        if: ${{ matrix.sdk == '2.7.2' }}
+      - name: Analyze project source
+        run: dartanalyzer .
       - name: Run tests
-        run: dart test
+        run: pub run test

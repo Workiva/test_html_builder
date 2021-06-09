@@ -14,26 +14,32 @@ dev_dependencies:
   test_html_builder: ^1.0.0
 ```
 
-Create as many HTML test templates in the `test/` directory as needed, e.g.:
+Create as many HTML test templates in a `test/templates/` directory as needed:
 
 ```html
-<!-- test/example_template.html -->
+<!-- test/templates/example_template.html -->
 <html>
-    <head>
-        <!-- Load custom assets needed by the test. -->
-        <script src="custom.js"></script>
+  <head>
+    <!-- The "testName" placeholder will be replaced with a unique name for
+    each test. -->
+    <title>{{testName}} Test</title>
 
-        <!-- Every template must include this token. -->
-        {test}
-        <!-- It will be replaced by the builder with the required tags:
-        <link rel="x-dart-test" href="...">
-        <script src="packages/test/dart.js"></script>
-        -->
-    </head>
+    <!-- Load custom assets needed by the test. -->
+    <script src="custom.js"></script>
+
+    <!-- Every template must include this placeholder. -->
+    {{testScript}}
+    <!-- It will be replaced by the builder with the required <link> tag:
+    <link rel="x-dart-test" href="...">
+    -->
+
+    <!-- Every template must include the test runner script. -->
+    <script src="packages/test/dart.js"></script>
+  </head>
 </html>
 ```
 
-Tell the builder which templates should be applied to which files, e.g.:
+Tell the builder which templates should be applied to which files. For example:
 
 ```yaml
 targets:
@@ -77,6 +83,79 @@ result in the following (hidden) generated outputs:
   must use the `.custom.html` extension:
   - `test/example_test.dart`
   - `test/example_test.custom.html`
+
+## Aggregating Browser Tests
+
+Some projects would like additional assurance in a more production-like
+environment. This is typically done by running browser tests in release mode
+(`-r|--release`), which compiles them with dart2js. However, in large projects
+with a lot of browser tests, this can be prohibitively slow because dart2js is
+not a modular compiler like the Dart Dev Compiler. This means that dart2js
+treats each browser test as a full program that must be compiled together with
+all of the files it imports transitively, which results in a lot of duplicate
+work.
+
+One option to workaround this slow process is to create an "aggregate" test that
+imports all of your browser tests and runs them. With this in place, dart2js
+only needs to compile one thing, but all of your browser tests still run. This
+approach has some caveats:
+- An aggregate test can only have one HTML file associated with it. If your
+project uses multiple HTML templates, you'd need an aggregate test for each.
+- You need to setup some config and customize the command used to run tests such
+that only the aggregate tests are compiled and run; otherwise, you might still
+be spending a bunch of time compiling all of the individual tests unnecessarily.
+
+The builder provided by this package can automate all of this! First, enable
+this functionality by setting `browser_aggregation: true`:
+
+```yaml
+targets:
+  $default:
+    builders:
+      test_html_builder:
+        options:
+          templates:
+            "test/react_with_styles_template.html":
+              - "test/components/styled/**_test.dart"
+            "test/react_template.html":
+              - "test/components/**_test.dart"
+          browser_aggregation: true
+```
+
+Once enabled, the builder will generate an aggregate test for each template that
+imports and runs each test that uses the template. It will also generate a
+default aggregate test for browser tests that don't match any of the templates.
+Finally, it generates a `test/dart_test.browser_aggregate.yaml` file that can be
+included in your project's `dart_test.yaml` so that the aggregate tests can be
+easily selected with this test argument: `--preset=browser-aggregate`
+
+To run these tests, you can use the executable provided by this package:
+
+```
+pub run test_html_builder:browser_aggregate_tests [--release]
+```
+
+Or, if you have your own test runner that you'd like to integrate this
+functionality into, you can run:
+
+```
+pub run test_html_builder:browser_aggregate_tests --mode=args [--release]
+```
+
+which will print the necessary build_runner and test args in this format:
+
+```
+<build args> -- <test args>
+
+# For example:
+--release --build-filter=test/templates/react_template.browser_aggregate_test.** -- --preset=browser-aggregate
+```
+
+You can parse these or pass them directly into a command to run tests, like so:
+
+```bash
+pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
+```
 
 ## Contributing
 
