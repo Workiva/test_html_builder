@@ -13,7 +13,7 @@ void main() {
     });
     final builder = TestHtmlBuilder(config);
     await testBuilder(builder, {
-      r'a|test/$test$': '',
+      r'a|$package$': '',
     }, outputs: {
       'a|test/templates/default_template.html': '''<!doctype html>
 <html>

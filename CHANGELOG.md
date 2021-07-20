@@ -1,3 +1,12 @@
+## 3.0.0
+
+- **Breaking change:** the browser aggregation feature now outputs the
+`dart_test.browser_aggregate.yaml` config file to the root of your package
+instead of the `test/` directory.
+- **Bug fix:** using the browser aggregation feature now works with build
+filters. Previously this would fail because the
+`dart_test.browser_aggregate.yaml` would be filtered out.
+
 ## 2.1.0
 
 - Add support for `--build-args` to the browser aggregation feature.

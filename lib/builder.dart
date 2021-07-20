@@ -20,8 +20,10 @@ import 'src/builder.dart';
 TestHtmlBuilder testHtmlBuilder(BuilderOptions options) =>
     TestHtmlBuilder(TestHtmlBuilderConfig.fromBuilderOptions(options));
 
-AggregateTestBuilder aggregateTestBuilder(_) => AggregateTestBuilder();
+AggregateTestBuilder aggregateTestBuilder(BuilderOptions _) =>
+    AggregateTestBuilder();
 
-TemplateBuilder templateBuilder(_) => TemplateBuilder();
+TemplateBuilder templateBuilder(BuilderOptions _) => TemplateBuilder();
 
-DartTestYamlBuilder dartTestYamlBuilder(_) => DartTestYamlBuilder();
+DartTestYamlBuilder dartTestYamlBuilder(BuilderOptions _) =>
+    DartTestYamlBuilder();
