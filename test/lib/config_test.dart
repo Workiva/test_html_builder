@@ -25,7 +25,7 @@ void main() {
         'test/foo_template.html': ['test/**_test.dart'],
       });
       expect(
-          config.templateGlobs['test/foo_template.html'].first
+          config.templateGlobs['test/foo_template.html']!.first
               .matches('test/foo_test.dart'),
           isTrue);
     });

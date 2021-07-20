@@ -30,7 +30,7 @@ part 'config.g.dart';
     fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool browserAggregation, Map<String, List<String>> templates})
+      {bool? browserAggregation, Map<String, List<String>>? templates})
       : browserAggregation = browserAggregation ?? false,
         templates = templates ?? {};
 
@@ -49,7 +49,7 @@ class TestHtmlBuilderConfig {
     try {
       return _$TestHtmlBuilderConfigFromJson(json);
     } on CheckedFromJsonException catch (e) {
-      final lines = <String>[
+      final lines = <String?>[
         'Could not parse the options provided for `test_html_builder`.'
       ];
 
@@ -70,13 +70,9 @@ class TestHtmlBuilderConfig {
 
   final Map<String, List<String>> templates;
 
-  Map<String, Iterable<Glob>> get templateGlobs {
-    _templateGlobs ??= templates.map((key, globPatterns) =>
-        MapEntry(key, globPatterns.map((pattern) => Glob(pattern))));
-    return _templateGlobs;
-  }
+  late final Map<String, Iterable<Glob>> templateGlobs = templates.map(
+      (key, globPatterns) =>
+          MapEntry(key, globPatterns.map((pattern) => Glob(pattern))));
 
-  Map<String, Iterable<Glob>> _templateGlobs;
-
-  Map<String, Object> toJson() => _$TestHtmlBuilderConfigToJson(this);
+  Map<String, dynamic> toJson() => _$TestHtmlBuilderConfigToJson(this);
 }

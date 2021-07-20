@@ -7,7 +7,7 @@ import 'package:test_process/test_process.dart';
 
 void main() {
   Future<String> createProject(
-      {bool browserAggregation, bool customBuildYaml}) async {
+      {bool? browserAggregation, bool? customBuildYaml}) async {
     browserAggregation ??= true;
     customBuildYaml ??= false;
     await d.dir('pkg', [
@@ -45,7 +45,7 @@ void main() {
   }
 
   Future<TestProcess> testBrowserAggregateExecutable(List<String> args,
-      {String workingDirectory}) async {
+      {String? workingDirectory}) async {
     final pubGet = await TestProcess.start('pub', ['get'],
         workingDirectory: workingDirectory);
     await pubGet.shouldExit(0);
