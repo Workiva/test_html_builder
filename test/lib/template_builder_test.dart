@@ -120,7 +120,8 @@ void main() {
           ))));
     });
 
-    test('logs SEVERE if template does not contain `{test}` token', () async {
+    test('logs SEVERE if template does not contain `{{testScript}}` token',
+        () async {
       final config = TestHtmlBuilderConfig(templates: {
         'test/template.html': ['test/**_test.dart'],
       });
