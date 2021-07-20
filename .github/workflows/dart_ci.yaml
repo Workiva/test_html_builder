@@ -14,20 +14,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        sdk: [ 2.7.2, stable, beta, dev ]
+        sdk: [ stable, beta, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - name: Install dependencies
-        run: pub get
+        run: dart pub get
       - name: Validate dependencies
-        run: pub run dependency_validator
+        run: dart pub run dependency_validator
       - name: Check formatting
-        run: dartfmt -w .
-        if: ${{ matrix.sdk == '2.7.2' }}
+        run: dart format --output=none --set-exit-if-changed .
+        if: ${{ matrix.sdk == 'stable' }}
       - name: Analyze project source
-        run: dartanalyzer .
+        run: dart analyze
       - name: Run tests
-        run: pub run test
+        run: dart test
