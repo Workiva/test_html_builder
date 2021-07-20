@@ -11,13 +11,13 @@ TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
     $checkKeys(json, allowedKeys: const ['browser_aggregation', 'templates']);
     final val = TestHtmlBuilderConfig(
       browserAggregation:
-          $checkedConvert(json, 'browser_aggregation', (v) => v as bool),
+          $checkedConvert(json, 'browser_aggregation', (v) => v as bool?),
       templates: $checkedConvert(
           json,
           'templates',
-          (v) => (v as Map)?.map(
+          (v) => (v as Map?)?.map(
                 (k, e) => MapEntry(k as String,
-                    (e as List)?.map((e) => e as String)?.toList()),
+                    (e as List<dynamic>).map((e) => e as String).toList()),
               )),
     );
     return val;

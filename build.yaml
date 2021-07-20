@@ -10,9 +10,9 @@ builders:
     builder_factories:
       - testHtmlBuilder
     build_extensions:
-      $test$:
-        - templates/default_template.html
-        - test_html_builder_config.json
+      $package$:
+        - test/templates/default_template.html
+        - test/test_html_builder_config.json
     auto_apply: root_package
     build_to: cache
     runs_before:
@@ -24,9 +24,6 @@ builders:
       - test_html_builder|aggregator
       - test_html_builder|dart_test_yaml
       - test_html_builder|templates
-    defaults:
-      generate_for:
-        - test/**
 
   test_html_builder|aggregator:
     import: "package:test_html_builder/builder.dart"
@@ -61,11 +58,6 @@ builders:
     builder_factories:
       - dartTestYamlBuilder
     build_extensions:
-      # TODO: once on latest Dart and build_runner, use this instead:
-      # $package$:
-      $test$:
+      $package$:
         - dart_test.browser_aggregate.yaml
     build_to: source
-    defaults:
-      generate_for:
-        - test/**

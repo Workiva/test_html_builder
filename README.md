@@ -7,12 +7,7 @@ builder can apply a template to any number of test files.
 
 ## Usage
 
-Add this package as a dev_dependency:
-
-```yaml
-dev_dependencies:
-  test_html_builder: ^1.0.0
-```
+Add this package as a dev_dependency: `dart pub add --dev test_html_builder`
 
 Create as many HTML test templates in a `test/templates/` directory as needed:
 

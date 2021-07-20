@@ -2,6 +2,7 @@ include: package:pedantic/analysis_options.1.8.0.yaml
 
 analyzer:
   exclude:
+    - example/project/**
     - lib/**.g.dart
   language:
     strict-inference: true
