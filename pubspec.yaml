@@ -28,6 +28,7 @@ dev_dependencies:
   build_test: ">=0.10.9 <2.0.0"
   build_web_compilers: ^2.3.0
   dependency_validator: ^2.0.0
+  meta: ">=1.2.2 <1.7.0" # Workaround to avoid https://github.com/dart-lang/sdk/issues/46142
   pedantic: ^1.8.0
   test_descriptor: ^1.2.0
   test_process: ^1.0.5
