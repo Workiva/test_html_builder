@@ -37,3 +37,7 @@ dev_dependencies:
   # uncomment this and comment out the test_html_builder definition in
   # `build.yaml`.
   # json_serializable: ^3.0.0
+
+dependency_validator:
+  ignore:
+    - meta
