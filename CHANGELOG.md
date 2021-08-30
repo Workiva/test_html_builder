@@ -1,8 +1,12 @@
-## 2.2.0
+## 2.1.2
 
 - **Bug fix:** using the browser aggregation feature now works with build
 filters. Previously this would fail because the
 `dart_test.browser_aggregate.yaml` output would be filtered out.
+
+## 2.1.1
+
+- Widen some dependency ranges to resolve on Dart 2.13.
 
 ## 2.1.0
 
