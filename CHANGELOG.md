@@ -1,3 +1,11 @@
+## 2.1.2
+
+- Treat Dart 2.13.4 as the primary SDK target for CI.
+
+## 2.1.1
+
+- Widen dependency ranges blocking Dart 2.13.
+
 ## 2.1.0
 
 - Add support for `--build-args` to the browser aggregation feature.
