@@ -7,7 +7,7 @@ description: >
 
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.11.0 <3.0.0"
 
 executables:
   browser_aggregate_tests:
