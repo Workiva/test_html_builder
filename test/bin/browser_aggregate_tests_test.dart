@@ -13,7 +13,7 @@ void main() {
     await d.dir('pkg', [
       d.file('pubspec.yaml', '''name: pkg
 environment:
-  sdk: '>=2.7.2 <3.0.0'
+  sdk: '>=2.11.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   build_test: any
