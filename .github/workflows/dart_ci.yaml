@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.7.2, stable, beta, dev ]
+        sdk: [ 2.7.2, 2.13.4, stable, beta, dev ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
@@ -26,8 +26,8 @@ jobs:
       - name: Validate dependencies
         run: pub run dependency_validator
       - name: Check formatting
-        run: dartfmt -w .
-        if: ${{ matrix.sdk == '2.7.2' }}
+        run: dart format --set-exit-if-changed -o none .
+        if: ${{ matrix.sdk == '2.13.4' }}
       - name: Analyze project source
         run: dartanalyzer .
       - name: Run tests

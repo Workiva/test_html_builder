@@ -1,12 +1,16 @@
-## 2.1.2
+## 2.1.3
 
 - **Bug fix:** using the browser aggregation feature now works with build
 filters. Previously this would fail because the
 `dart_test.browser_aggregate.yaml` output would be filtered out.
 
+## 2.1.2
+
+- Treat Dart 2.13.4 as the primary SDK target for CI.
+
 ## 2.1.1
 
-- Widen some dependency ranges to resolve on Dart 2.13.
+- Widen dependency ranges blocking Dart 2.13.
 
 ## 2.1.0
 
