@@ -36,9 +36,9 @@ class TestHtmlBuilder implements Builder {
 
   @override
   final buildExtensions = {
-    r'$test$': [
-      'templates/default_template.html',
-      'test_html_builder_config.json',
+    r'$package$': [
+      'test/templates/default_template.html',
+      'test/test_html_builder_config.json',
     ]
   };
 
@@ -250,9 +250,7 @@ class TemplateBuilder implements Builder {
 class DartTestYamlBuilder extends Builder {
   @override
   final buildExtensions = const {
-    // TODO: once on latest Dart and build_runner, use this:
-    // r'$package$': ['dart_test.browser_aggregate.yaml'],
-    r'$test$': ['dart_test.browser_aggregate.yaml'],
+    r'$package$': ['test/dart_test.browser_aggregate.yaml'],
   };
 
   @override
