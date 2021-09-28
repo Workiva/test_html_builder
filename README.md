@@ -11,7 +11,7 @@ Add this package as a dev_dependency:
 
 ```yaml
 dev_dependencies:
-  test_html_builder: ^1.0.0
+  test_html_builder: ^2.0.0
 ```
 
 Create as many HTML test templates in a `test/templates/` directory as needed:
