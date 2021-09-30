@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
@@ -134,6 +135,17 @@ class AggregateTestBuilder extends Builder {
 
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
+
+    if (_config.randomizeAggregation) {
+      log.fine('randomizing test order');
+      final randomizedMains = mains.toString().split(';\n')
+        ..removeWhere((element) => element.isEmpty);
+      randomizedMains.shuffle(Random());
+      mains.clear();
+      for (String item in randomizedMains) {
+        mains.writeln("  $item;");
+      }
+    }
 
     final contents = DartFormatter().format('''@TestOn('browser')
 import 'package:test/test.dart';

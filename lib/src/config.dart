@@ -30,8 +30,11 @@ part 'config.g.dart';
     fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool browserAggregation, Map<String, List<String>> templates})
+      {bool browserAggregation,
+      bool randomizeAggregation,
+      Map<String, List<String>> templates})
       : browserAggregation = browserAggregation ?? false,
+        randomizeAggregation = randomizeAggregation ?? false,
         templates = templates ?? {};
 
   factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
@@ -67,6 +70,8 @@ class TestHtmlBuilderConfig {
   }
 
   final bool browserAggregation;
+
+  final bool randomizeAggregation;
 
   final Map<String, List<String>> templates;
 

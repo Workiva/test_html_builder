@@ -8,10 +8,16 @@ part of lib.src.config;
 
 TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
   return $checkedNew('TestHtmlBuilderConfig', json, () {
-    $checkKeys(json, allowedKeys: const ['browser_aggregation', 'templates']);
+    $checkKeys(json, allowedKeys: const [
+      'browser_aggregation',
+      'randomize_aggregation',
+      'templates'
+    ]);
     final val = TestHtmlBuilderConfig(
       browserAggregation:
           $checkedConvert(json, 'browser_aggregation', (v) => v as bool),
+      randomizeAggregation:
+          $checkedConvert(json, 'randomize_aggregation', (v) => v as bool),
       templates: $checkedConvert(
           json,
           'templates',
@@ -21,12 +27,16 @@ TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
               )),
     );
     return val;
-  }, fieldKeyMap: const {'browserAggregation': 'browser_aggregation'});
+  }, fieldKeyMap: const {
+    'browserAggregation': 'browser_aggregation',
+    'randomizeAggregation': 'randomize_aggregation'
+  });
 }
 
 Map<String, dynamic> _$TestHtmlBuilderConfigToJson(
         TestHtmlBuilderConfig instance) =>
     <String, dynamic>{
       'browser_aggregation': instance.browserAggregation,
+      'randomize_aggregation': instance.randomizeAggregation,
       'templates': instance.templates,
     };

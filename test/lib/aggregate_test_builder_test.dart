@@ -71,20 +71,69 @@ void main() {
         'a|test/templates/foo_template.html': '',
         'a|test/templates/bar_template.html': '',
         'a|test/vm_test.dart': "@TestOn('vm') library vm_test;",
-        'a|test/other_test.dart': '',
+        'a|test/a_test.dart': '',
+        'a|test/b_test.dart': '',
       }, outputs: {
         'a|test/templates/default_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
-import '../other_test.dart' as other_test;
+import '../a_test.dart' as a_test;
+import '../b_test.dart' as b_test;
 
 void main() {
-  other_test.main();
+  a_test.main();
+  b_test.main();
 }
 '''
       });
     });
+
+    test('generates a default randomizes aggregate test for browser tests',
+        () async {
+      final config = TestHtmlBuilderConfig(
+          browserAggregation: true,
+          randomizeAggregation: true,
+          templates: {
+            'test/templates/foo_template.html': ['test/foo_test.dart'],
+            'test/templates/bar_template.html': ['test/bar_test.dart'],
+          });
+      final builder = AggregateTestBuilder();
+      await testBuilder(builder, {
+        'a|test/test_html_builder_config.json': jsonEncode(config),
+        'a|test/templates/default_template.html': '',
+        'a|test/templates/foo_template.html': '',
+        'a|test/templates/bar_template.html': '',
+        'a|test/vm_test.dart': "@TestOn('vm') library vm_test;",
+        'a|test/a_test.dart': '',
+        'a|test/b_test.dart': '',
+        'a|test/c_test.dart': '',
+        'a|test/d_test.dart': '',
+        'a|test/e_test.dart': '',
+      }, outputs: {
+        'a|test/templates/default_template.browser_aggregate_test.dart': decodedMatches(allOf(
+            contains('''@TestOn('browser')
+import 'package:test/test.dart';
+
+import '../a_test.dart' as a_test;
+import '../b_test.dart' as b_test;
+import '../c_test.dart' as c_test;
+import '../d_test.dart' as d_test;
+import '../e_test.dart' as e_test;
+'''),
+            isNot(contains('''
+void main() {
+  a_test.main();
+  b_test.main();
+  c_test.main();
+  d_test.main();
+  e_test.main();
+}
+'''))))
+      });
+    },
+        retry:
+            1); // putting in a single retry here because there is a chance that the data could be the same
 
     test('if multiple templates match, chooses first one', () async {
       final config =
