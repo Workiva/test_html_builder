@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: pub get
       - name: Validate dependencies
-        run: pub run dependency_validator
+        run: dart run dependency_validator
       - name: Check formatting
         run: dart format --set-exit-if-changed -o none .
         if: ${{ matrix.sdk == '2.13.4' }}
