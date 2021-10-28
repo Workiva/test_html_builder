@@ -94,7 +94,7 @@ void main() {
       final config = TestHtmlBuilderConfig(
           browserAggregation: true,
           randomizeAggregation: true,
-          testShuffleSeed: 1,
+          testShuffleSeed: 2,
           templates: {
             'test/templates/foo_template.html': ['test/foo_test.dart'],
             'test/templates/bar_template.html': ['test/bar_test.dart'],
