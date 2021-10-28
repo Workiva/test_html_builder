@@ -94,6 +94,7 @@ void main() {
       final config = TestHtmlBuilderConfig(
           browserAggregation: true,
           randomizeAggregation: true,
+          testShuffleSeed: 1,
           templates: {
             'test/templates/foo_template.html': ['test/foo_test.dart'],
             'test/templates/bar_template.html': ['test/bar_test.dart'],
@@ -131,9 +132,7 @@ void main() {
 }
 '''))))
       });
-    },
-        retry:
-            1); // putting in a single retry here because there is a chance that the data could be the same
+    });
 
     test('if multiple templates match, chooses first one', () async {
       final config =

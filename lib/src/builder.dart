@@ -140,7 +140,10 @@ class AggregateTestBuilder extends Builder {
       log.fine('randomizing test order');
       final randomizedMains = mains.toString().split(';\n')
         ..removeWhere((element) => element.isEmpty);
-      randomizedMains.shuffle(Random());
+      var seed = _config.testShuffleSeed;
+      log.warning(
+          'Shuffling test order with --test-randomize-ordering-seed=$seed');
+      randomizedMains.shuffle(Random(seed));
       mains.clear();
       for (String item in randomizedMains) {
         mains.writeln("  $item;");
