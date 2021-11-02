@@ -60,8 +60,8 @@ void main(List<String> args) async {
       break;
   }
 
-  final bool release = parsed['release'];
-  final String buildArgs = parsed['build-args'];
+  final bool? release = parsed['release'];
+  final String? buildArgs = parsed['build-args'];
 
   buildAggregateTestYaml(mode, userBuildArgs: buildArgs);
   final testPaths = parseAggregateTestPaths(mode);
@@ -82,7 +82,7 @@ void main(List<String> args) async {
 ///
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
-void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
+void buildAggregateTestYaml(Mode mode, {String? userBuildArgs}) {
   var executable = 'dart';
   var args = [
     'run',
@@ -131,7 +131,7 @@ targets:
 
   final config =
       loadYaml(configFile.readAsStringSync(), sourceUrl: configFile.uri);
-  List<String> paths;
+  late List<String> paths;
   try {
     paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
   } catch (e, stack) {
@@ -153,7 +153,7 @@ targets:
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
 List<String> buildRunnerBuildArgs(List<String> testPaths,
-        {bool release, String userBuildArgs}) =>
+        {bool? release, String? userBuildArgs}) =>
     [
       ...?userBuildArgs?.split(' '),
       if (release ?? false) '--release',
@@ -165,7 +165,7 @@ List<String> buildRunnerBuildArgs(List<String> testPaths,
 ///
 /// Includes `--release` if [release] is true.
 Future<void> buildTests(List<String> testPaths,
-    {bool release, String userBuildArgs}) async {
+    {bool? release, String? userBuildArgs}) async {
   final executable = 'dart';
   final args = [
     'run',
@@ -187,7 +187,7 @@ Future<void> buildTests(List<String> testPaths,
 ///
 /// Includes `--release` if [release] is true.
 Future<void> runTests(List<String> testPaths,
-    {bool release, String userBuildArgs}) async {
+    {bool? release, String? userBuildArgs}) async {
   final executable = 'dart';
   final args = [
     'run',

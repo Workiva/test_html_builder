@@ -75,9 +75,9 @@ class AggregateTestBuilder extends Builder {
   @override
   Future<void> build(BuildStep buildStep) async {
     _config ??= await decodeConfig(buildStep);
-    if (!_config.browserAggregation) {
+    if (!_config!.browserAggregation) {
       log.fine('browser aggregation disabled');
-      if (_config.randomizeOrderingSeed != null) {
+      if (_config!.randomizeOrderingSeed != null) {
         log.warning(
             '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.');
       }
@@ -88,21 +88,21 @@ class AggregateTestBuilder extends Builder {
     final isDefault = templatePath == 'test/templates/default_template.html';
     final testGlobs = isDefault
         ? [Glob('test/**_test.dart')]
-        : _config.templateGlobs[templatePath] ?? [];
+        : _config!.templateGlobs[templatePath] ?? [];
     log.fine(
         'Test globs found for template: ${buildStep.inputId}:\n${testGlobs.join('\n')}');
 
     final higherPrecedenceGlobs = <Glob>[];
     if (isDefault) {
       // For the default template, all defined globs are higher precedence.
-      for (final globs in _config.templateGlobs.values) {
+      for (final globs in _config!.templateGlobs.values) {
         higherPrecedenceGlobs.addAll(globs);
       }
     } else {
-      for (final t in _config.templateGlobs.keys) {
+      for (final t in _config!.templateGlobs.keys) {
         // Only templates defined before the current one take precedence.
         if (t == templatePath) break;
-        higherPrecedenceGlobs.addAll(_config.templateGlobs[t]);
+        higherPrecedenceGlobs.addAll(_config!.templateGlobs[t]!);
       }
     }
 
@@ -141,10 +141,10 @@ class AggregateTestBuilder extends Builder {
     if (imports.isEmpty) return;
     if (_randomSeed != null) {
       log.info(
-          'Shuffling test order with `randomize_ordering_seed: $_randomSeed`\n');
-      mains.shuffle(Random(_randomSeed));
+          'Shuffling test order with `randomize_ordering_seed: ${_randomSeed!}`\n');
+      mains.shuffle(Random(_randomSeed!));
       mains.insert(0,
-          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$_randomSeed\"`');");
+          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"${_randomSeed!}\"`');");
     }
 
     final contents = DartFormatter().format('''@TestOn('browser')
@@ -180,22 +180,22 @@ ${mains.join('\n')}
   bool _isBrowserTest(Metadata testMetadata) => _browserRuntimes
       .any((r) => testMetadata.testOn.evaluate(SuitePlatform(r)));
 
-  TestHtmlBuilderConfig _config;
+  TestHtmlBuilderConfig? _config;
 
   /// Returns the randomization seed as configured in build.yaml.
   ///
   /// If the configured value is "random", a seed will be chosen at random.
   /// The value will be cached on this builder so that all aggregate tests share
   /// the same seed to make debugging simpler.
-  int get _randomSeed {
-    final configuredSeed = _config.randomizeOrderingSeed;
+  int? get _randomSeed {
+    final configuredSeed = _config?.randomizeOrderingSeed;
     if (configuredSeed == null) return null;
     return __randomSeed ??= configuredSeed.toLowerCase() == 'random'
         ? Random().nextInt(4294967295)
         : int.parse(configuredSeed);
   }
 
-  int __randomSeed;
+  int? __randomSeed;
 }
 
 /// Builder that uses templates to generate HTML files for dart tests.
@@ -216,7 +216,7 @@ class TemplateBuilder implements Builder {
 
   static AssetId getHtmlId(AssetId assetId) => assetId.changeExtension('.html');
 
-  AssetId getTemplateId(
+  AssetId? getTemplateId(
       Map<String, Iterable<Glob>> templates, AssetId assetId) {
     if (assetId.path.endsWith('.browser_aggregate_test.dart')) {
       return AssetId(assetId.package,
@@ -224,7 +224,7 @@ class TemplateBuilder implements Builder {
     }
 
     for (final templatePath in templates.keys) {
-      final globs = templates[templatePath];
+      final globs = templates[templatePath]!;
       if (globs.any((glob) => glob.matches(assetId.path))) {
         return AssetId(assetId.package, templatePath);
       }
@@ -245,7 +245,7 @@ class TemplateBuilder implements Builder {
     }
 
     _config ??= await decodeConfig(buildStep);
-    final templateId = getTemplateId(_config.templateGlobs, buildStep.inputId);
+    final templateId = getTemplateId(_config!.templateGlobs, buildStep.inputId);
     if (templateId == null) {
       return;
     }
@@ -291,7 +291,7 @@ class TemplateBuilder implements Builder {
     }
   }
 
-  TestHtmlBuilderConfig _config;
+  TestHtmlBuilderConfig? _config;
 }
 
 class DartTestYamlBuilder extends Builder {
