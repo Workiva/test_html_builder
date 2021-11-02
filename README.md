@@ -125,9 +125,14 @@ targets:
 Once enabled, the builder will generate an aggregate test for each template that
 imports and runs each test that uses the template. It will also generate a
 default aggregate test for browser tests that don't match any of the templates.
-Finally, it generates a `test/dart_test.browser_aggregate.yaml` file that can be
+Finally, it generates a `dart_test.browser_aggregate.yaml` file that can be
 included in your project's `dart_test.yaml` so that the aggregate tests can be
-easily selected with this test argument: `--preset=browser-aggregate`
+easily selected with this test argument: `--preset=browser-aggregate`.
+
+```yaml
+# dart_test.yaml
+include: dart_test.browser_aggregate.yaml
+```
 
 To run these tests, you can use the executable provided by this package:
 

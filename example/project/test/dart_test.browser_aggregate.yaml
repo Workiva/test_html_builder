@@ -1,8 +1,0 @@
-presets:
-  browser-aggregate:
-    platforms: [chrome]
-    paths:
-      - test/templates/css_template.browser_aggregate_test.dart
-      - test/templates/script_template.browser_aggregate_test.dart
-      - test/templates/default_template.browser_aggregate_test.dart
-      - test/unit/custom_html_test.dart

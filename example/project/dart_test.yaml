@@ -3,4 +3,4 @@ platforms:
 paths:
   - test/unit/
 
-include: test/dart_test.browser_aggregate.yaml
+include: dart_test.browser_aggregate.yaml

@@ -10,6 +10,9 @@ builders:
     builder_factories:
       - testHtmlBuilder
     build_extensions:
+      $test$:
+        - templates/default_template.html
+        - test_html_builder_config.json
       $package$:
         - test/templates/default_template.html
         - test/test_html_builder_config.json
@@ -59,5 +62,5 @@ builders:
       - dartTestYamlBuilder
     build_extensions:
       $package$:
-        - test/dart_test.browser_aggregate.yaml
+        - dart_test.browser_aggregate.yaml
     build_to: source

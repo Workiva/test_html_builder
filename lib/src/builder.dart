@@ -297,7 +297,7 @@ class TemplateBuilder implements Builder {
 class DartTestYamlBuilder extends Builder {
   @override
   final buildExtensions = const {
-    r'$package$': ['test/dart_test.browser_aggregate.yaml'],
+    r'$package$': ['dart_test.browser_aggregate.yaml'],
   };
 
   @override
@@ -307,7 +307,7 @@ class DartTestYamlBuilder extends Builder {
       return;
     }
 
-    log.fine('Building test/dart_test.browser_aggregate.yaml');
+    log.fine('Building dart_test.browser_aggregate.yaml');
     final contents = StringBuffer()..writeln('''presets:
   browser-aggregate:
     platforms: [chrome]
@@ -328,8 +328,8 @@ class DartTestYamlBuilder extends Builder {
       contents.writeln('      - $customTestPath');
     }
 
-    final outputId = AssetId(
-        buildStep.inputId.package, 'test/dart_test.browser_aggregate.yaml');
+    final outputId =
+        AssetId(buildStep.inputId.package, 'dart_test.browser_aggregate.yaml');
     await buildStep.writeAsString(outputId, contents.toString());
   }
 }
