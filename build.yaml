@@ -10,6 +10,9 @@ builders:
     builder_factories:
       - testHtmlBuilder
     build_extensions:
+      $test$:
+        - templates/default_template.html
+        - test_html_builder_config.json
       $package$:
         - test/templates/default_template.html
         - test/test_html_builder_config.json
