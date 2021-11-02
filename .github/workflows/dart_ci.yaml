@@ -32,3 +32,5 @@ jobs:
         run: dart analyze
       - name: Run tests
         run: dart test
+      - name: Example consumer tests
+        run: ./tool/test_example.sh
