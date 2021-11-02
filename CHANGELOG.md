@@ -1,3 +1,9 @@
+## 3.0.0
+
+- **Breaking change:** the browser aggregation feature now outputs the
+`dart_test.browser_aggregate.yaml` config file to the root of your package
+instead of the `test/` directory.
+
 ## 2.2.0
 - Add ability to 'randomize' tests within the aggregated test file with the
 `randomize_ordering_seed` option.

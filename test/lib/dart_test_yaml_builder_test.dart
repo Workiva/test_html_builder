@@ -32,7 +32,7 @@ void main() {
         'a|test/custom_test.dart': '',
         'a|test/custom_test.custom.html': '',
       }, outputs: {
-        'a|test/dart_test.browser_aggregate.yaml': '''presets:
+        'a|dart_test.browser_aggregate.yaml': '''presets:
   browser-aggregate:
     platforms: [chrome]
     paths:

@@ -95,7 +95,7 @@ void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
     // Users may also supply additional build arguments. For example, some
     // repos may need to specify a custom build.yaml file to be used.
     ...?userBuildArgs?.split(' '),
-    '--build-filter=test/dart_test.browser_aggregate.yaml'
+    '--build-filter=dart_test.browser_aggregate.yaml'
   ];
   logIf(mode != Mode.args, 'Building browser aggregate test config...');
   logIf(mode != Mode.args, '$executable ${args.join(' ')}');
@@ -114,7 +114,7 @@ void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
 /// could not be parsed.
 List<String> parseAggregateTestPaths(Mode mode) {
   logIf(mode != Mode.args, '\nReading browser aggregate test config...');
-  final configFile = File('test/dart_test.browser_aggregate.yaml');
+  final configFile = File('dart_test.browser_aggregate.yaml');
   if (!configFile.existsSync()) {
     stdout
         .writeln(r'''browser aggregation is not enabled. Update your build.yaml:
