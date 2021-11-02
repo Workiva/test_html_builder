@@ -1,3 +1,7 @@
+## 2.1.4
+
+- Widen dependency ranges blocking analyzer `1.x`
+
 ## 2.1.3
 
 - **Bug fix:** using the browser aggregation feature now works with build
