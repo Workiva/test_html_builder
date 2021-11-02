@@ -22,7 +22,7 @@ final argParser = ArgParser()
       defaultsTo: 'test')
   ..addOption('build-args',
       help: 'Args to pass to the build runner process.\n'
-          'Run "pub run build_runner build -h -v" to see all available '
+          'Run "dart run build_runner build -h -v" to see all available '
           'options.');
 
 enum Mode {
@@ -83,7 +83,7 @@ void main(List<String> args) async {
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
 void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
-  var executable = 'pub';
+  var executable = 'dart';
   var args = [
     'run',
     'build_runner',
@@ -166,7 +166,7 @@ List<String> buildRunnerBuildArgs(List<String> testPaths,
 /// Includes `--release` if [release] is true.
 Future<void> buildTests(List<String> testPaths,
     {bool release, String userBuildArgs}) async {
-  final executable = 'pub';
+  final executable = 'dart';
   final args = [
     'run',
     'build_runner',
@@ -188,7 +188,7 @@ Future<void> buildTests(List<String> testPaths,
 /// Includes `--release` if [release] is true.
 Future<void> runTests(List<String> testPaths,
     {bool release, String userBuildArgs}) async {
-  final executable = 'pub';
+  final executable = 'dart';
   final args = [
     'run',
     'build_runner',
