@@ -89,16 +89,12 @@ void main() {
       });
     });
 
-    test('generates a default randomizes aggregate test for browser tests',
+    test('randomizes the ordering of tests in aggregate for browser tests',
         () async {
       final config = TestHtmlBuilderConfig(
-          browserAggregation: true,
-          randomizeAggregation: true,
-          testShuffleSeed: 2,
-          templates: {
-            'test/templates/foo_template.html': ['test/foo_test.dart'],
-            'test/templates/bar_template.html': ['test/bar_test.dart'],
-          });
+        browserAggregation: true,
+        randomizeOrderingSeed: '2',
+      );
       final builder = AggregateTestBuilder();
       await testBuilder(builder, {
         'a|test/test_html_builder_config.json': jsonEncode(config),
@@ -112,8 +108,8 @@ void main() {
         'a|test/d_test.dart': '',
         'a|test/e_test.dart': '',
       }, outputs: {
-        'a|test/templates/default_template.browser_aggregate_test.dart': decodedMatches(allOf(
-            contains('''@TestOn('browser')
+        'a|test/templates/default_template.browser_aggregate_test.dart':
+            '''@TestOn('browser')
 import 'package:test/test.dart';
 
 import '../a_test.dart' as a_test;
@@ -121,16 +117,15 @@ import '../b_test.dart' as b_test;
 import '../c_test.dart' as c_test;
 import '../d_test.dart' as d_test;
 import '../e_test.dart' as e_test;
-'''),
-            isNot(contains('''
+
 void main() {
-  a_test.main();
-  b_test.main();
   c_test.main();
-  d_test.main();
+  a_test.main();
   e_test.main();
+  b_test.main();
+  d_test.main();
 }
-'''))))
+'''
       });
     });
 

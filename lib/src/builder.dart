@@ -103,7 +103,7 @@ class AggregateTestBuilder extends Builder {
     }
 
     final imports = StringBuffer();
-    final mains = StringBuffer();
+    final mains = <String>[];
     for (final glob in testGlobs) {
       await for (final id in buildStep.findAssets(glob)) {
         // If any of the template globs defined above this one match this test,
@@ -129,25 +129,20 @@ class AggregateTestBuilder extends Builder {
         final path =
             p.relative(id.path, from: p.dirname(buildStep.inputId.path));
         imports.writeln("import '$path' as $prefix;");
-        mains.writeln("  $prefix.main();");
+        mains.add("  $prefix.main();");
       }
     }
 
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
-
-    if (_config.randomizeAggregation) {
-      log.fine('randomizing test order');
-      final randomizedMains = mains.toString().split(';\n')
-        ..removeWhere((element) => element.isEmpty);
-      var seed = _config.testShuffleSeed;
-      log.warning(
+    if (_config.randomizeOrderingSeed != null) {
+      var seed = _config.randomizeOrderingSeed.toLowerCase() == 'random'
+          ? Random().nextInt(4294967295)
+          : int.parse(_config.randomizeOrderingSeed);
+      log.info(
           'Shuffling test order with --test-randomize-ordering-seed=$seed');
-      randomizedMains.shuffle(Random(seed));
-      mains.clear();
-      for (String item in randomizedMains) {
-        mains.writeln("  $item;");
-      }
+
+      mains.shuffle(Random(seed));
     }
 
     final contents = DartFormatter().format('''@TestOn('browser')
@@ -155,7 +150,8 @@ import 'package:test/test.dart';
 
 $imports
 void main() {
-$mains}
+${mains.join('\n')}
+}
 ''');
 
     final outputId =

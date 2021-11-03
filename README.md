@@ -157,6 +157,29 @@ You can parse these or pass them directly into a command to run tests, like so:
 pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
 ```
 
+### Randomizing the browser aggregation file
+By default, the tests will be aggregating in a specific order and this will be maintained between
+each test run. In order to mimic the dart test runner's built in test shuffling capability a consumer can add
+this to their yaml file to randomly shuffle the test order.
+
+```yaml
+targets:
+  $default:
+    builders:
+      test_html_builder:
+        options:
+          ...
+          randomize_ordering_seed: random
+```
+
+If you notice a test failure due to the specific shuffling that occurred during that test
+run, update the test_shuffle_seed to be whatever was output in the test runners log.
+
+### Note
+
+When randomizing the test order it is recommended to ignore the aggregated test file from version
+control to avoid constant updates.
+
 ## Contributing
 
 See the [Contributing Guidelines][contributing].
