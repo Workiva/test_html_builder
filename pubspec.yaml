@@ -36,7 +36,7 @@ dev_dependencies:
   # If changes are made to `lib/src/config.dart` and regeneration is needed,
   # uncomment this and comment out the test_html_builder definition in
   # `build.yaml`.
-  json_serializable: ^3.0.0
+  # json_serializable: ^3.0.0
   # json_serializable: ^4.0.0
 
 dependency_validator:
