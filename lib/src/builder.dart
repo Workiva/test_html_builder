@@ -139,8 +139,8 @@ class AggregateTestBuilder extends Builder {
       var seed = _config.randomizeOrderingSeed.toLowerCase() == 'random'
           ? Random().nextInt(4294967295)
           : int.parse(_config.randomizeOrderingSeed);
-      log.info(
-          'Shuffling test order with --test-randomize-ordering-seed=$seed');
+      log.shout(
+          'Shuffling test order with `randomize_ordering_seed: $seed`');
 
       mains.shuffle(Random(seed));
     }

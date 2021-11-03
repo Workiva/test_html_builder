@@ -175,11 +175,11 @@ targets:
 ```
 
 If you notice a test failure due to the specific shuffling that occurred during that test
-run, update the test_shuffle_seed to be whatever was output in the test runners log.
+run, update the `randomize_ordering_seed` option to be whatever was output in the test runners log.
 
 ### Note
 
-When randomizing the test order it is recommended to ignore the aggregated test file from version
+When randomizing the test order it is recommended to ignore the aggregated test files from version
 control to avoid constant updates.
 
 ## Contributing

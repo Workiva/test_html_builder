@@ -32,7 +32,6 @@ part 'config.g.dart';
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
       {bool browserAggregation,
-      bool randomizeAggregation,
       String randomizeOrderingSeed,
       Map<String, List<String>> templates})
       : browserAggregation = browserAggregation ?? false,
