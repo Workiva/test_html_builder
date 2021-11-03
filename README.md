@@ -171,6 +171,7 @@ targets:
       test_html_builder:
         options:
           ...
+          browser_aggregation: true
           randomize_ordering_seed: random
 ```
 
