@@ -79,7 +79,7 @@ class AggregateTestBuilder extends Builder {
       log.fine('browser aggregation disabled');
       if (_config.randomizeOrderingSeed != null) {
         log.warning(
-            'In order randomize browser aggregation ensure, browser_aggregation is enabled');
+            '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.');
       }
       return;
     }
@@ -143,7 +143,7 @@ class AggregateTestBuilder extends Builder {
       var seed = _config.randomizeOrderingSeed.toLowerCase() == 'random'
           ? Random().nextInt(4294967295)
           : int.parse(_config.randomizeOrderingSeed);
-      log.shout('Shuffling test order with `randomize_ordering_seed: $seed`');
+      log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
 
       mains.shuffle(Random(seed));
     }
