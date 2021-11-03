@@ -71,16 +71,59 @@ void main() {
         'a|test/templates/foo_template.html': '',
         'a|test/templates/bar_template.html': '',
         'a|test/vm_test.dart': "@TestOn('vm') library vm_test;",
-        'a|test/other_test.dart': '',
+        'a|test/a_test.dart': '',
+        'a|test/b_test.dart': '',
       }, outputs: {
         'a|test/templates/default_template.browser_aggregate_test.dart':
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
-import '../other_test.dart' as other_test;
+import '../a_test.dart' as a_test;
+import '../b_test.dart' as b_test;
 
 void main() {
-  other_test.main();
+  a_test.main();
+  b_test.main();
+}
+'''
+      });
+    });
+
+    test('randomizes the ordering of tests in aggregate for browser tests',
+        () async {
+      final config = TestHtmlBuilderConfig(
+        browserAggregation: true,
+        randomizeOrderingSeed: '2',
+      );
+      final builder = AggregateTestBuilder();
+      await testBuilder(builder, {
+        'a|test/test_html_builder_config.json': jsonEncode(config),
+        'a|test/templates/default_template.html': '',
+        'a|test/templates/foo_template.html': '',
+        'a|test/templates/bar_template.html': '',
+        'a|test/vm_test.dart': "@TestOn('vm') library vm_test;",
+        'a|test/a_test.dart': '',
+        'a|test/b_test.dart': '',
+        'a|test/c_test.dart': '',
+        'a|test/d_test.dart': '',
+        'a|test/e_test.dart': '',
+      }, outputs: {
+        'a|test/templates/default_template.browser_aggregate_test.dart':
+            '''@TestOn('browser')
+import 'package:test/test.dart';
+
+import '../a_test.dart' as a_test;
+import '../b_test.dart' as b_test;
+import '../c_test.dart' as c_test;
+import '../d_test.dart' as d_test;
+import '../e_test.dart' as e_test;
+
+void main() {
+  c_test.main();
+  a_test.main();
+  e_test.main();
+  b_test.main();
+  d_test.main();
 }
 '''
       });

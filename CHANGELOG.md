@@ -1,3 +1,7 @@
+## 2.2.0
+- Add ability to 'randomize' tests within the aggregated test file with the
+`randomize_ordering_seed` option.
+
 ## 2.1.3
 
 - **Bug fix:** using the browser aggregation feature now works with build

@@ -157,6 +157,32 @@ You can parse these or pass them directly into a command to run tests, like so:
 pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
 ```
 
+### Randomizing the browser aggregation file
+With `dart test`, you can randomize the order in which test files are run by using the `--test-randomize-ordering-seed` flag. However, when using the this package's browser aggregation feature, this method of test order randomization doesn't work because there will be only be one test file for each template. In other words, most of the tests will continue to be run in the same order.
+
+For that reason, test_html_builder also supports a `randomize_ordering_seed` option that can be set in your `build.yaml`. It behaves essentially the same as the `--test-randomize-ordering-seed` flag, meaning that you can set the value to a specific seed or `"random"` if you'd like the seed to be picked at random for you.
+
+Here's an example:
+
+```yaml
+targets:
+  $default:
+    builders:
+      test_html_builder:
+        options:
+          ...
+          browser_aggregation: true
+          randomize_ordering_seed: random
+```
+
+If you notice a test failure due to the specific shuffling that occurred during that test
+run, update the `randomize_ordering_seed` option to be whatever was output in the test runners log.
+
+### Note
+
+When randomizing the test order it is recommended to ignore the aggregated test files from version
+control to avoid constant updates.
+
 ## Contributing
 
 See the [Contributing Guidelines][contributing].

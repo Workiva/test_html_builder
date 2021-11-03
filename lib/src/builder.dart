@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
@@ -76,6 +77,10 @@ class AggregateTestBuilder extends Builder {
     _config ??= await decodeConfig(buildStep);
     if (!_config.browserAggregation) {
       log.fine('browser aggregation disabled');
+      if (_config.randomizeOrderingSeed != null) {
+        log.warning(
+            '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.');
+      }
       return;
     }
 
@@ -102,7 +107,7 @@ class AggregateTestBuilder extends Builder {
     }
 
     final imports = StringBuffer();
-    final mains = StringBuffer();
+    final mains = <String>[];
     for (final glob in testGlobs) {
       await for (final id in buildStep.findAssets(glob)) {
         // If any of the template globs defined above this one match this test,
@@ -128,19 +133,28 @@ class AggregateTestBuilder extends Builder {
         final path =
             p.relative(id.path, from: p.dirname(buildStep.inputId.path));
         imports.writeln("import '$path' as $prefix;");
-        mains.writeln("  $prefix.main();");
+        mains.add("  $prefix.main();");
       }
     }
 
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
+    if (_config.randomizeOrderingSeed != null) {
+      var seed = _config.randomizeOrderingSeed.toLowerCase() == 'random'
+          ? Random().nextInt(4294967295)
+          : int.parse(_config.randomizeOrderingSeed);
+      log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
+
+      mains.shuffle(Random(seed));
+    }
 
     final contents = DartFormatter().format('''@TestOn('browser')
 import 'package:test/test.dart';
 
 $imports
 void main() {
-$mains}
+${mains.join('\n')}
+}
 ''');
 
     final outputId =

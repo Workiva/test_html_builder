@@ -9,18 +9,21 @@ void main() {
       final options = BuilderOptions({});
       final config = TestHtmlBuilderConfig.fromBuilderOptions(options);
       expect(config.browserAggregation, isFalse);
+      expect(config.randomizeOrderingSeed, isNull);
       expect(config.templateGlobs, isEmpty);
     });
 
     test('with overrides', () {
       final options = BuilderOptions({
         'browser_aggregation': true,
+        'randomize_ordering_seed': 'random',
         'templates': {
           'test/foo_template.html': ['test/**_test.dart'],
         }
       });
       final config = TestHtmlBuilderConfig.fromBuilderOptions(options);
       expect(config.browserAggregation, isTrue);
+      expect(config.randomizeOrderingSeed, 'random');
       expect(config.templates, {
         'test/foo_template.html': ['test/**_test.dart'],
       });

@@ -20,6 +20,7 @@ library lib.src.config;
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:math';
 
 part 'config.g.dart';
 
@@ -30,8 +31,11 @@ part 'config.g.dart';
     fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool browserAggregation, Map<String, List<String>> templates})
+      {bool browserAggregation,
+      String randomizeOrderingSeed,
+      Map<String, List<String>> templates})
       : browserAggregation = browserAggregation ?? false,
+        randomizeOrderingSeed = randomizeOrderingSeed,
         templates = templates ?? {};
 
   factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
@@ -67,6 +71,10 @@ class TestHtmlBuilderConfig {
   }
 
   final bool browserAggregation;
+
+  // This is meant to mirror what's happening in the dev test package if you see how the default value is determined
+  // https://github.com/dart-lang/test/blob/c586cff0f415f9c3006175352b9634ba900fd7d2/pkgs/test_core/lib/src/runner/configuration/args.dart#L259-L261
+  final String randomizeOrderingSeed;
 
   final Map<String, List<String>> templates;
 
