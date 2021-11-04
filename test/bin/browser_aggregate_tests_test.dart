@@ -13,12 +13,11 @@ void main() {
     await d.dir('pkg', [
       d.file('pubspec.yaml', '''name: pkg
 environment:
-  sdk: '>=2.7.2 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   build_test: any
   build_web_compilers: any
-  meta: ">=1.2.2 <1.7.0" # Workaround to avoid https://github.com/dart-lang/sdk/issues/46142
   test: any
   test_html_builder:
     path: ${p.current}
