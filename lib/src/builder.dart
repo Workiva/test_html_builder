@@ -139,13 +139,12 @@ class AggregateTestBuilder extends Builder {
 
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
-    if (_config.randomizeOrderingSeed != null) {
-      var seed = _config.randomizeOrderingSeed.toLowerCase() == 'random'
-          ? Random().nextInt(4294967295)
-          : int.parse(_config.randomizeOrderingSeed);
-      log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
-
-      mains.shuffle(Random(seed));
+    if (_randomSeed != null) {
+      log.info(
+          'Shuffling test order with `randomize_ordering_seed: $_randomSeed`\n');
+      mains.shuffle(Random(_randomSeed));
+      mains.insert(0,
+          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$_randomSeed\"`');");
     }
 
     final contents = DartFormatter().format('''@TestOn('browser')
@@ -182,6 +181,21 @@ ${mains.join('\n')}
       .any((r) => testMetadata.testOn.evaluate(SuitePlatform(r)));
 
   TestHtmlBuilderConfig _config;
+
+  /// Returns the randomization seed as configured in build.yaml.
+  ///
+  /// If the configured value is "random", a seed will be chosen at random.
+  /// The value will be cached on this builder so that all aggregate tests share
+  /// the same seed to make debugging simpler.
+  int get _randomSeed {
+    final configuredSeed = _config.randomizeOrderingSeed;
+    if (configuredSeed == null) return null;
+    return __randomSeed ??= configuredSeed.toLowerCase() == 'random'
+        ? Random().nextInt(4294967295)
+        : int.parse(configuredSeed);
+  }
+
+  int __randomSeed;
 }
 
 /// Builder that uses templates to generate HTML files for dart tests.

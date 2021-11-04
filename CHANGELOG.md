@@ -1,4 +1,11 @@
+## 2.2.1
+
+- When running tests, print the `randomize_ordering_seed` that was used to build
+each browser aggregate test file. This should make it easier to debug test
+failures that occur due to the randomized ordering.
+
 ## 2.2.0
+
 - Add ability to 'randomize' tests within the aggregated test file with the
 `randomize_ordering_seed` option.
 
