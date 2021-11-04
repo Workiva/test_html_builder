@@ -119,6 +119,8 @@ import '../d_test.dart' as d_test;
 import '../e_test.dart' as e_test;
 
 void main() {
+  print(
+      'test/templates/default_template.html built with `randomize_ordering_seed: "2"`');
   c_test.main();
   a_test.main();
   e_test.main();
