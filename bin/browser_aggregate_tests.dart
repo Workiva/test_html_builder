@@ -23,7 +23,13 @@ final argParser = ArgParser()
   ..addOption('build-args',
       help: 'Args to pass to the build runner process.\n'
           'Run "pub run build_runner build -h -v" to see all available '
-          'options.');
+          'options.')
+  ..addFlag('verbose',
+      abbr: 'v',
+      help: 'Logs as much as possible.\n'
+          'In particular, when used with --mode=args, build logs will still be printed to stderr.\n'
+          'This makes more info visible (for debugging CI, for example), but requires that you\n'
+          'parse the args only from stdout.');
 
 enum Mode {
   // Print build and test args separated by `--`
@@ -36,16 +42,18 @@ enum Mode {
 
 void logIf(bool condition, String msg) {
   if (!condition) return;
-  stdout.writeln(msg);
+  stderr.writeln(msg);
 }
 
 void main(List<String> args) async {
   final parsed = argParser.parse(args);
 
   if (parsed['help'] ?? false) {
-    stdout.writeln(argParser.usage);
+    stderr.writeln(argParser.usage);
     return;
   }
+
+  final verbose = parsed['verbose'] ?? false;
 
   Mode mode;
   switch (parsed['mode']) {
@@ -63,7 +71,8 @@ void main(List<String> args) async {
   final bool release = parsed['release'];
   final String buildArgs = parsed['build-args'];
 
-  buildAggregateTestYaml(mode, userBuildArgs: buildArgs);
+  await buildAggregateTestYaml(mode,
+      userBuildArgs: buildArgs, verbose: verbose);
   final testPaths = parseAggregateTestPaths(mode);
   if (mode == Mode.args) {
     printArgs(testPaths);
@@ -82,7 +91,8 @@ void main(List<String> args) async {
 ///
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
-void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
+void buildAggregateTestYaml(Mode mode,
+    {String userBuildArgs, bool verbose}) async {
   var executable = 'pub';
   var args = [
     'run',
@@ -100,7 +110,7 @@ void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
   logIf(mode != Mode.args, 'Building browser aggregate test config...');
   logIf(mode != Mode.args, '$executable ${args.join(' ')}');
   var result = Process.runSync(executable, args);
-  logIf(result.exitCode != 0 || mode != Mode.args,
+  logIf(result.exitCode != 0 || mode != Mode.args || verbose,
       '${result.stderr}\n${result.stdout}');
   if (result.exitCode != 0) {
     exit(result.exitCode);
@@ -116,7 +126,7 @@ List<String> parseAggregateTestPaths(Mode mode) {
   logIf(mode != Mode.args, '\nReading browser aggregate test config...');
   final configFile = File('test/dart_test.browser_aggregate.yaml');
   if (!configFile.existsSync()) {
-    stdout
+    stderr
         .writeln(r'''browser aggregation is not enabled. Update your build.yaml:
 
 # build.yaml
@@ -135,7 +145,7 @@ targets:
   try {
     paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
   } catch (e, stack) {
-    stdout
+    stderr
       ..writeln('Failed to read test paths from "${configFile.uri}"')
       ..writeln(e)
       ..writeln(stack);
@@ -174,7 +184,7 @@ Future<void> buildTests(List<String> testPaths,
     ...buildRunnerBuildArgs(testPaths,
         release: release, userBuildArgs: userBuildArgs),
   ];
-  stdout
+  stderr
     ..writeln()
     ..writeln('Building browser aggregate tests...')
     ..writeln('$executable ${args.join(' ')}');
@@ -198,7 +208,7 @@ Future<void> runTests(List<String> testPaths,
     '--',
     testPreset,
   ];
-  stdout
+  stderr
     ..writeln()
     ..writeln('Running browser aggregate tests...')
     ..writeln('$executable ${args.join(' ')}');

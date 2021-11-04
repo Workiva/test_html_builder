@@ -1,4 +1,10 @@
+## 2.3.0
+
+- Add a `--verbose` flag to `test_html_builder:browser_aggregate_tests`
+executable so that build logs can still be seen when running with `--mode=args`.
+
 ## 2.2.0
+
 - Add ability to 'randomize' tests within the aggregated test file with the
 `randomize_ordering_seed` option.
 
