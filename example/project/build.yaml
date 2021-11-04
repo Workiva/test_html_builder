@@ -4,6 +4,7 @@ targets:
       test_html_builder:
         options:
           browser_aggregation: true
+          randomize_ordering_seed: random
           templates:
             "test/templates/script_template.html":
               - "test/unit/script_test.dart"
