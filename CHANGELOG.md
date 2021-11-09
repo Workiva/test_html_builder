@@ -1,3 +1,10 @@
+## 2.2.2
+
+- When browser aggregation is enabled in `build.yaml`, ensure that the
+`test/dart_test.browser_aggregate.yaml` asset is always generated even when
+`--build-filter` options are used. This is a workaround only necessary with
+older versions of the `build` dependencies and is fixed in the latest.
+
 ## 2.2.1
 
 - When running tests, print the `randomize_ordering_seed` that was used to build
