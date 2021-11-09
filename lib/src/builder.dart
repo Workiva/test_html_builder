@@ -270,25 +270,6 @@ class TemplateBuilder implements Builder {
         .replaceFirst('{{testScript}}', link)
         .replaceAll('{{testName}}', testName);
     await buildStep.writeAsString(htmlId, htmlContents);
-
-    // WORKAROUND: This is a temporary step only needed in 2.x to workaround a
-    // bug where running `dart run build_runner build` with `--build-filter`s
-    // deletes outputs that use `$package$` as the input. This results in the
-    // `test/dart_test.browser_aggregate.yaml` file not existing, which causes
-    // the test runner to fail when parsing the root `dart_test.yaml` that tries
-    // to include that generated file. By reading this file in this build step,
-    // we force the build system to generate it if it doesn't yet exist.
-    //
-    // In the 3.x release of this package, newer versions of build packages will
-    // be resolvable and those versions include a fix for this behavior, so this
-    // workaround will not be needed.
-    if (_config.browserAggregation) {
-      final browserAggregateTestYaml = AssetId(
-          buildStep.inputId.package, 'test/dart_test.browser_aggregate.yaml');
-      if (await buildStep.canRead(browserAggregateTestYaml)) {
-        await buildStep.readAsString(browserAggregateTestYaml);
-      }
-    }
   }
 
   TestHtmlBuilderConfig? _config;
