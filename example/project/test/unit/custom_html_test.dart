@@ -5,6 +5,6 @@ import 'package:test/test.dart';
 
 void main() {
   test('custom ID', () {
-    expect(document.body.id, 'custom');
+    expect(document.body!.id, 'custom');
   });
 }

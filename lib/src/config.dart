@@ -20,7 +20,6 @@ library lib.src.config;
 import 'package:build/build.dart';
 import 'package:glob/glob.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:math';
 
 part 'config.g.dart';
 
@@ -31,9 +30,9 @@ part 'config.g.dart';
     fieldRename: FieldRename.snake)
 class TestHtmlBuilderConfig {
   TestHtmlBuilderConfig(
-      {bool browserAggregation,
-      String randomizeOrderingSeed,
-      Map<String, List<String>> templates})
+      {bool? browserAggregation,
+      String? randomizeOrderingSeed,
+      Map<String, List<String>>? templates})
       : browserAggregation = browserAggregation ?? false,
         randomizeOrderingSeed = randomizeOrderingSeed,
         templates = templates ?? {};
@@ -57,13 +56,16 @@ class TestHtmlBuilderConfig {
         'Could not parse the options provided for `test_html_builder`.'
       ];
 
-      if (e.key != null) {
-        lines.add('There is a problem with "${e.key}".');
+      final key = e.key;
+      final message = e.message;
+      final innerError = e.innerError;
+      if (key != null) {
+        lines.add('There is a problem with "$key".');
       }
-      if (e.message != null) {
-        lines.add(e.message);
-      } else if (e.innerError != null) {
-        lines.add(e.innerError.toString());
+      if (message != null) {
+        lines.add(message);
+      } else if (innerError != null) {
+        lines.add(innerError.toString());
       }
 
       throw StateError(lines.join('\n'));
@@ -74,17 +76,13 @@ class TestHtmlBuilderConfig {
 
   // This is meant to mirror what's happening in the dev test package if you see how the default value is determined
   // https://github.com/dart-lang/test/blob/c586cff0f415f9c3006175352b9634ba900fd7d2/pkgs/test_core/lib/src/runner/configuration/args.dart#L259-L261
-  final String randomizeOrderingSeed;
+  final String? randomizeOrderingSeed;
 
   final Map<String, List<String>> templates;
 
-  Map<String, Iterable<Glob>> get templateGlobs {
-    _templateGlobs ??= templates.map((key, globPatterns) =>
-        MapEntry(key, globPatterns.map((pattern) => Glob(pattern))));
-    return _templateGlobs;
-  }
+  late final Map<String, Iterable<Glob>> templateGlobs = templates.map(
+      (key, globPatterns) =>
+          MapEntry(key, globPatterns.map((pattern) => Glob(pattern))));
 
-  Map<String, Iterable<Glob>> _templateGlobs;
-
-  Map<String, Object> toJson() => _$TestHtmlBuilderConfigToJson(this);
+  Map<String, dynamic> toJson() => _$TestHtmlBuilderConfigToJson(this);
 }

@@ -15,15 +15,15 @@ TestHtmlBuilderConfig _$TestHtmlBuilderConfigFromJson(Map json) {
     ]);
     final val = TestHtmlBuilderConfig(
       browserAggregation:
-          $checkedConvert(json, 'browser_aggregation', (v) => v as bool),
+          $checkedConvert(json, 'browser_aggregation', (v) => v as bool?),
       randomizeOrderingSeed:
-          $checkedConvert(json, 'randomize_ordering_seed', (v) => v as String),
+          $checkedConvert(json, 'randomize_ordering_seed', (v) => v as String?),
       templates: $checkedConvert(
           json,
           'templates',
-          (v) => (v as Map)?.map(
+          (v) => (v as Map?)?.map(
                 (k, e) => MapEntry(k as String,
-                    (e as List)?.map((e) => e as String)?.toList()),
+                    (e as List<dynamic>).map((e) => e as String).toList()),
               )),
     );
     return val;
