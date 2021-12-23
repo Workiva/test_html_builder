@@ -74,10 +74,10 @@ class AggregateTestBuilder extends Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
-    _config ??= await decodeConfig(buildStep);
-    if (!_config!.browserAggregation) {
+    final config = await _getConfig(buildStep);
+    if (!config.browserAggregation) {
       log.fine('browser aggregation disabled');
-      if (_config!.randomizeOrderingSeed != null) {
+      if (config.randomizeOrderingSeed != null) {
         log.warning(
             '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.');
       }
@@ -88,21 +88,21 @@ class AggregateTestBuilder extends Builder {
     final isDefault = templatePath == 'test/templates/default_template.html';
     final testGlobs = isDefault
         ? [Glob('test/**_test.dart')]
-        : _config!.templateGlobs[templatePath] ?? [];
+        : config.templateGlobs[templatePath] ?? [];
     log.fine(
         'Test globs found for template: ${buildStep.inputId}:\n${testGlobs.join('\n')}');
 
     final higherPrecedenceGlobs = <Glob>[];
     if (isDefault) {
       // For the default template, all defined globs are higher precedence.
-      for (final globs in _config!.templateGlobs.values) {
+      for (final globs in config.templateGlobs.values) {
         higherPrecedenceGlobs.addAll(globs);
       }
     } else {
-      for (final t in _config!.templateGlobs.keys) {
+      for (final t in config.templateGlobs.keys) {
         // Only templates defined before the current one take precedence.
         if (t == templatePath) break;
-        higherPrecedenceGlobs.addAll(_config!.templateGlobs[t]!);
+        higherPrecedenceGlobs.addAll(config.templateGlobs[t]!);
       }
     }
 
@@ -139,12 +139,13 @@ class AggregateTestBuilder extends Builder {
 
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
-    if (_randomSeed != null) {
-      log.info(
-          'Shuffling test order with `randomize_ordering_seed: ${_randomSeed!}`\n');
-      mains.shuffle(Random(_randomSeed!));
+
+    final seed = _getRandomSeed();
+    if (seed != null) {
+      log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
+      mains.shuffle(Random(seed));
       mains.insert(0,
-          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"${_randomSeed!}\"`');");
+          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$seed\"`');");
     }
 
     final contents = DartFormatter().format('''@TestOn('browser')
@@ -180,15 +181,18 @@ ${mains.join('\n')}
   bool _isBrowserTest(Metadata testMetadata) => _browserRuntimes
       .any((r) => testMetadata.testOn.evaluate(SuitePlatform(r)));
 
-  TestHtmlBuilderConfig? _config;
+  Future<TestHtmlBuilderConfig> _getConfig(BuildStep buildStep) async =>
+      __config ??= await decodeConfig(buildStep);
+
+  TestHtmlBuilderConfig? __config;
 
   /// Returns the randomization seed as configured in build.yaml.
   ///
   /// If the configured value is "random", a seed will be chosen at random.
   /// The value will be cached on this builder so that all aggregate tests share
   /// the same seed to make debugging simpler.
-  int? get _randomSeed {
-    final configuredSeed = _config?.randomizeOrderingSeed;
+  int? _getRandomSeed() {
+    final configuredSeed = __config?.randomizeOrderingSeed;
     if (configuredSeed == null) return null;
     return __randomSeed ??= configuredSeed.toLowerCase() == 'random'
         ? Random().nextInt(4294967295)
@@ -244,8 +248,8 @@ class TemplateBuilder implements Builder {
       return;
     }
 
-    _config ??= await decodeConfig(buildStep);
-    final templateId = getTemplateId(_config!.templateGlobs, buildStep.inputId);
+    final config = await _getConfig(buildStep);
+    final templateId = getTemplateId(config.templateGlobs, buildStep.inputId);
     if (templateId == null) {
       return;
     }
@@ -272,7 +276,10 @@ class TemplateBuilder implements Builder {
     await buildStep.writeAsString(htmlId, htmlContents);
   }
 
-  TestHtmlBuilderConfig? _config;
+  Future<TestHtmlBuilderConfig> _getConfig(BuildStep buildStep) async =>
+      __config ??= await decodeConfig(buildStep);
+
+  TestHtmlBuilderConfig? __config;
 }
 
 class DartTestYamlBuilder extends Builder {
