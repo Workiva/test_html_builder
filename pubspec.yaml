@@ -42,3 +42,6 @@ dev_dependencies:
 dependency_validator:
   ignore:
     - meta
+
+dependency_overrides:
+  yaml: 3.0.0
