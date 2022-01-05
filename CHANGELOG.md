@@ -1,3 +1,10 @@
+## 3.0.0
+
+- Migrate to null safety.
+- **Breaking change:** the browser aggregation feature now outputs the
+`dart_test.browser_aggregate.yaml` config file to the root of your package
+instead of the `test/` directory.
+
 ## 2.2.2
 
 - When browser aggregation is enabled in `build.yaml`, ensure that the

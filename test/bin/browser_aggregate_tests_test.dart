@@ -7,18 +7,17 @@ import 'package:test_process/test_process.dart';
 
 void main() {
   Future<String> createProject(
-      {bool browserAggregation, bool customBuildYaml}) async {
+      {bool? browserAggregation, bool? customBuildYaml}) async {
     browserAggregation ??= true;
     customBuildYaml ??= false;
     await d.dir('pkg', [
       d.file('pubspec.yaml', '''name: pkg
 environment:
-  sdk: '>=2.7.2 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 dev_dependencies:
   build_runner: any
   build_test: any
   build_web_compilers: any
-  meta: ">=1.2.2 <1.7.0" # Workaround to avoid https://github.com/dart-lang/sdk/issues/46142
   test: any
   test_html_builder:
     path: ${p.current}
@@ -32,8 +31,7 @@ dev_dependencies:
           browser_aggregation: true
 '''),
       if (browserAggregation)
-        d.file(
-            'dart_test.yaml', 'include: test/dart_test.browser_aggregate.yaml'),
+        d.file('dart_test.yaml', 'include: dart_test.browser_aggregate.yaml'),
       d.dir('test', [
         d.file('foo_test.dart', '''@TestOn('browser')
 import 'package:test/test.dart';
@@ -47,12 +45,12 @@ void main() {
   }
 
   Future<TestProcess> testBrowserAggregateExecutable(List<String> args,
-      {String workingDirectory}) async {
-    final pubGet = await TestProcess.start('pub', ['get'],
+      {String? workingDirectory}) async {
+    final pubGet = await TestProcess.start('dart', ['pub', 'get'],
         workingDirectory: workingDirectory);
     await pubGet.shouldExit(0);
     return TestProcess.start(
-        'pub', ['run', 'test_html_builder:browser_aggregate_tests', ...args],
+        'dart', ['run', 'test_html_builder:browser_aggregate_tests', ...args],
         workingDirectory: workingDirectory);
   }
 
@@ -92,12 +90,12 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --delete-conflicting-outputs --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'dart run build_runner build --delete-conflicting-outputs --build-filter=dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'pub run build_runner build --build-filter=test/templates/default_template.browser_aggregate_test.**'),
+              'dart run build_runner build --build-filter=test/templates/default_template.browser_aggregate_test.**'),
           emitsThrough(contains('Succeeded')),
         ]));
     await process.shouldExit(0);
@@ -113,12 +111,12 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --delete-conflicting-outputs -c custom --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'dart run build_runner build --delete-conflicting-outputs -c custom --build-filter=dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'pub run build_runner build -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**'),
+              'dart run build_runner build -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**'),
           emitsThrough(contains('Succeeded')),
         ]));
     await process.shouldExit(0);
@@ -134,12 +132,12 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --delete-conflicting-outputs --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'dart run build_runner build --delete-conflicting-outputs --build-filter=dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'pub run build_runner test --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
+              'dart run build_runner test --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
           emitsThrough(contains('All tests passed!')),
         ]));
     await process.shouldExit(0);
@@ -156,12 +154,12 @@ void main() {
         emitsInOrder([
           emitsThrough('Building browser aggregate test config...'),
           emitsThrough(
-              'pub run build_runner build --delete-conflicting-outputs --release -c custom --build-filter=test/dart_test.browser_aggregate.yaml'),
+              'dart run build_runner build --delete-conflicting-outputs --release -c custom --build-filter=dart_test.browser_aggregate.yaml'),
           emitsThrough(contains('Succeeded')),
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'pub run build_runner test --release -c custom --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
+              'dart run build_runner test --release -c custom --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
           emitsThrough(contains('All tests passed!')),
         ]));
     await process.shouldExit(0);

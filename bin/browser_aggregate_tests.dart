@@ -22,7 +22,7 @@ final argParser = ArgParser()
       defaultsTo: 'test')
   ..addOption('build-args',
       help: 'Args to pass to the build runner process.\n'
-          'Run "pub run build_runner build -h -v" to see all available '
+          'Run "dart run build_runner build -h -v" to see all available '
           'options.');
 
 enum Mode {
@@ -60,8 +60,8 @@ void main(List<String> args) async {
       break;
   }
 
-  final bool release = parsed['release'];
-  final String buildArgs = parsed['build-args'];
+  final bool? release = parsed['release'];
+  final String? buildArgs = parsed['build-args'];
 
   buildAggregateTestYaml(mode, userBuildArgs: buildArgs);
   final testPaths = parseAggregateTestPaths(mode);
@@ -82,8 +82,8 @@ void main(List<String> args) async {
 ///
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
-void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
-  var executable = 'pub';
+void buildAggregateTestYaml(Mode mode, {String? userBuildArgs}) {
+  var executable = 'dart';
   var args = [
     'run',
     'build_runner',
@@ -95,7 +95,7 @@ void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
     // Users may also supply additional build arguments. For example, some
     // repos may need to specify a custom build.yaml file to be used.
     ...?userBuildArgs?.split(' '),
-    '--build-filter=test/dart_test.browser_aggregate.yaml'
+    '--build-filter=dart_test.browser_aggregate.yaml'
   ];
   logIf(mode != Mode.args, 'Building browser aggregate test config...');
   logIf(mode != Mode.args, '$executable ${args.join(' ')}');
@@ -114,7 +114,7 @@ void buildAggregateTestYaml(Mode mode, {String userBuildArgs}) {
 /// could not be parsed.
 List<String> parseAggregateTestPaths(Mode mode) {
   logIf(mode != Mode.args, '\nReading browser aggregate test config...');
-  final configFile = File('test/dart_test.browser_aggregate.yaml');
+  final configFile = File('dart_test.browser_aggregate.yaml');
   if (!configFile.existsSync()) {
     stdout
         .writeln(r'''browser aggregation is not enabled. Update your build.yaml:
@@ -131,7 +131,7 @@ targets:
 
   final config =
       loadYaml(configFile.readAsStringSync(), sourceUrl: configFile.uri);
-  List<String> paths;
+  late List<String> paths;
   try {
     paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
   } catch (e, stack) {
@@ -153,7 +153,7 @@ targets:
 /// [userBuildArgs] is interpreted as a space delimited string of additional
 /// build_runner build arguments and will also be included.
 List<String> buildRunnerBuildArgs(List<String> testPaths,
-        {bool release, String userBuildArgs}) =>
+        {bool? release, String? userBuildArgs}) =>
     [
       ...?userBuildArgs?.split(' '),
       if (release ?? false) '--release',
@@ -165,8 +165,8 @@ List<String> buildRunnerBuildArgs(List<String> testPaths,
 ///
 /// Includes `--release` if [release] is true.
 Future<void> buildTests(List<String> testPaths,
-    {bool release, String userBuildArgs}) async {
-  final executable = 'pub';
+    {bool? release, String? userBuildArgs}) async {
+  final executable = 'dart';
   final args = [
     'run',
     'build_runner',
@@ -187,8 +187,8 @@ Future<void> buildTests(List<String> testPaths,
 ///
 /// Includes `--release` if [release] is true.
 Future<void> runTests(List<String> testPaths,
-    {bool release, String userBuildArgs}) async {
-  final executable = 'pub';
+    {bool? release, String? userBuildArgs}) async {
+  final executable = 'dart';
   final args = [
     'run',
     'build_runner',

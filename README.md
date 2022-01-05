@@ -9,9 +9,8 @@ builder can apply a template to any number of test files.
 
 Add this package as a dev_dependency:
 
-```yaml
-dev_dependencies:
-  test_html_builder: ^1.0.0
+```bash
+dart pub add --dev test_html_builder
 ```
 
 Create as many HTML test templates in a `test/templates/` directory as needed:
@@ -65,7 +64,7 @@ To illustrate how this works, consider an example test directory structure:
     - `styled/`
       - `baz_test.dart`
 
-Running tests via `pub run build_runner test` with the above configuration will
+Running tests via `dart run build_runner test` with the above configuration will
 result in the following (hidden) generated outputs:
 
 - `test/components/bar_test.html` (from `react_template.html`)
@@ -125,21 +124,26 @@ targets:
 Once enabled, the builder will generate an aggregate test for each template that
 imports and runs each test that uses the template. It will also generate a
 default aggregate test for browser tests that don't match any of the templates.
-Finally, it generates a `test/dart_test.browser_aggregate.yaml` file that can be
+Finally, it generates a `dart_test.browser_aggregate.yaml` file that can be
 included in your project's `dart_test.yaml` so that the aggregate tests can be
-easily selected with this test argument: `--preset=browser-aggregate`
+easily selected with this test argument: `--preset=browser-aggregate`.
+
+```yaml
+# dart_test.yaml
+include: dart_test.browser_aggregate.yaml
+```
 
 To run these tests, you can use the executable provided by this package:
 
 ```
-pub run test_html_builder:browser_aggregate_tests [--release]
+dart run test_html_builder:browser_aggregate_tests [--release]
 ```
 
 Or, if you have your own test runner that you'd like to integrate this
 functionality into, you can run:
 
 ```
-pub run test_html_builder:browser_aggregate_tests --mode=args [--release]
+dart run test_html_builder:browser_aggregate_tests --mode=args [--release]
 ```
 
 which will print the necessary build_runner and test args in this format:
@@ -154,7 +158,7 @@ which will print the necessary build_runner and test args in this format:
 You can parse these or pass them directly into a command to run tests, like so:
 
 ```bash
-pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
+dart run build_runner test $(dart run test_html_builder:browser_aggregate_tests --mode=args [--release])
 ```
 
 ### Randomizing the browser aggregation file

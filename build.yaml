@@ -10,6 +10,9 @@ builders:
     builder_factories:
       - testHtmlBuilder
     build_extensions:
+      $test$:
+        - templates/default_template.html
+        - test_html_builder_config.json
       $package$:
         - test/templates/default_template.html
         - test/test_html_builder_config.json
@@ -19,7 +22,7 @@ builders:
       - build_test|test_bootstrap
       - test_html_builder|aggregator
       - test_html_builder|dart_test_yaml
-      - test_html_builder|template
+      - test_html_builder|templates
     applies_builders:
       - test_html_builder|aggregator
       - test_html_builder|dart_test_yaml
@@ -35,6 +38,7 @@ builders:
     build_to: source
     is_optional: true
     runs_before:
+      - test_html_builder|dart_test_yaml
       - test_html_builder|templates
       - build_test|test_bootstrap
     defaults:
@@ -59,5 +63,5 @@ builders:
       - dartTestYamlBuilder
     build_extensions:
       $package$:
-        - test/dart_test.browser_aggregate.yaml
+        - dart_test.browser_aggregate.yaml
     build_to: source
