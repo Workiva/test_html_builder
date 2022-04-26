@@ -106,7 +106,7 @@ class AggregateTestBuilder extends Builder {
       }
     }
 
-    final imports = StringBuffer();
+    final imports = <String>[];
     final mains = <String>[];
     for (final glob in testGlobs) {
       await for (final id in buildStep.findAssets(glob)) {
@@ -132,7 +132,7 @@ class AggregateTestBuilder extends Builder {
         final prefix = _importPrefixForTest(id.path);
         final path =
             p.relative(id.path, from: p.dirname(buildStep.inputId.path));
-        imports.writeln("import '$path' as $prefix;");
+        imports.add("import '$path' as $prefix;");
         mains.add("  $prefix.main();");
       }
     }
@@ -140,18 +140,28 @@ class AggregateTestBuilder extends Builder {
     // Don't generate an empty aggregate test.
     if (imports.isEmpty) return;
 
+    // Sort the imports. This is important because the ordering of
+    // `buildStep.findAssets` above is filesystem-dependent, meaning that users
+    // on different operating systems might get different results.
+    imports.sort();
+
     final seed = _getRandomSeed();
     if (seed != null) {
       log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
       mains.shuffle(Random(seed));
       mains.insert(0,
           "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$seed\"`');");
+    } else {
+      // If the test order was not shuffled, sort them for the same reason we
+      // sort the imports.
+      mains.sort();
     }
 
     final contents = DartFormatter().format('''@TestOn('browser')
 import 'package:test/test.dart';
 
-$imports
+${imports.join('\n')}
+
 void main() {
 ${mains.join('\n')}
 }

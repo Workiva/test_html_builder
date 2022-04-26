@@ -138,7 +138,8 @@ void main() {
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
               'dart run build_runner test --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
-          emitsThrough(contains('All tests passed!')),
+          emitsThrough(
+              anyOf(contains('All tests passed!'), contains('1 test passed.'))),
         ]));
     await process.shouldExit(0);
   });
@@ -160,7 +161,8 @@ void main() {
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
               'dart run build_runner test --release -c custom --build-filter=test/templates/default_template.browser_aggregate_test.** -- --preset=browser-aggregate'),
-          emitsThrough(contains('All tests passed!')),
+          emitsThrough(
+              anyOf(contains('All tests passed!'), contains('1 test passed.'))),
         ]));
     await process.shouldExit(0);
   });

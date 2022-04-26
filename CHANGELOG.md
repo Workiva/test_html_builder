@@ -1,3 +1,8 @@
+## 3.0.1
+
+- Sort the imports and test invocations when generating aggregate tests. This
+ensures consistent builder outputs across different operating systems.
+
 ## 3.0.0
 
 - Migrate to null safety.
