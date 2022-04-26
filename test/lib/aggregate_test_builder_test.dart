@@ -140,8 +140,8 @@ void main() {
       final builder = AggregateTestBuilder();
       await testBuilder(builder, {
         'a|test/test_html_builder_config.json': jsonEncode(config),
-        'a|test/foo_test.dart': '',
         'a|test/bar_test.dart': '',
+        'a|test/foo_test.dart': '',
         'a|test/templates/foo_template.html': '',
         'a|test/templates/bar_template.html': '',
       }, outputs: {
@@ -149,12 +149,44 @@ void main() {
             '''@TestOn('browser')
 import 'package:test/test.dart';
 
-import '../foo_test.dart' as foo_test;
 import '../bar_test.dart' as bar_test;
+import '../foo_test.dart' as foo_test;
 
 void main() {
-  foo_test.main();
   bar_test.main();
+  foo_test.main();
+}
+'''
+      });
+    });
+
+    test('sorts the test imports and invocations', () async {
+      final config =
+          TestHtmlBuilderConfig(browserAggregation: true, templates: {
+        'test/templates/foo_template.html': ['test/**_test.dart'],
+      });
+      final builder = AggregateTestBuilder();
+      await testBuilder(builder, {
+        'a|test/test_html_builder_config.json': jsonEncode(config),
+        'a|test/templates/foo_template.html': '',
+        // These three are intentionally unsorted so that this test can verify
+        // that the builder sorts them.
+        'a|test/foo_test.dart': '',
+        'a|test/baz/baz_test.dart': '',
+        'a|test/bar_test.dart': '',
+      }, outputs: {
+        'a|test/templates/foo_template.browser_aggregate_test.dart':
+            '''@TestOn('browser')
+import 'package:test/test.dart';
+
+import '../bar_test.dart' as bar_test;
+import '../baz/baz_test.dart' as baz_baz_test;
+import '../foo_test.dart' as foo_test;
+
+void main() {
+  bar_test.main();
+  baz_baz_test.main();
+  foo_test.main();
 }
 '''
       });
