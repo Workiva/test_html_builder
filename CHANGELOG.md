@@ -1,3 +1,7 @@
+## 2.2.3
+
+- Widen dependency range on `yaml` to allow v3.
+
 ## 2.2.2
 
 - When browser aggregation is enabled in `build.yaml`, ensure that the
