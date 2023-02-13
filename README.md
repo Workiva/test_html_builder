@@ -65,7 +65,7 @@ To illustrate how this works, consider an example test directory structure:
     - `styled/`
       - `baz_test.dart`
 
-Running tests via `pub run build_runner test` with the above configuration will
+Running tests via `dart run build_runner test` with the above configuration will
 result in the following (hidden) generated outputs:
 
 - `test/components/bar_test.html` (from `react_template.html`)
@@ -132,14 +132,14 @@ easily selected with this test argument: `--preset=browser-aggregate`
 To run these tests, you can use the executable provided by this package:
 
 ```
-pub run test_html_builder:browser_aggregate_tests [--release]
+dart run test_html_builder:browser_aggregate_tests [--release]
 ```
 
 Or, if you have your own test runner that you'd like to integrate this
 functionality into, you can run:
 
 ```
-pub run test_html_builder:browser_aggregate_tests --mode=args [--release]
+dart run test_html_builder:browser_aggregate_tests --mode=args [--release]
 ```
 
 which will print the necessary build_runner and test args in this format:
@@ -154,7 +154,7 @@ which will print the necessary build_runner and test args in this format:
 You can parse these or pass them directly into a command to run tests, like so:
 
 ```bash
-pub run build_runner test $(pub run test_html_builder:browser_aggregate_tests --mode=args [--release])
+dart run build_runner test $(dart run test_html_builder:browser_aggregate_tests --mode=args [--release])
 ```
 
 ### Randomizing the browser aggregation file
