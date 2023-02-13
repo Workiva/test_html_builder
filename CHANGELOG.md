@@ -1,3 +1,7 @@
+## 2.2.4
+
+- Use `dart` CLI everywhere to ensure compatibility with newer Dart SDKs.
+
 ## 2.2.3
 
 - Widen dependency range on `yaml` to allow v3.
