@@ -38,6 +38,13 @@ void main() {
     paths:
       - test/foo_template.browser_aggregate_test.dart
       - test/custom_test.dart
+''',
+        'a|test/dart_test.browser_aggregate.yaml': '''presets:
+  browser-aggregate:
+    platforms: [chrome]
+    paths:
+      - test/foo_template.browser_aggregate_test.dart
+      - test/custom_test.dart
 '''
       });
     });
