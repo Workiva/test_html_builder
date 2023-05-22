@@ -1,3 +1,10 @@
+## 3.0.3
+
+- For consumers using the browser aggregation feature, update the builder to
+also output the `dart_test.browser_aggregate.yaml` config file to the same
+location used in v2: the `test/` directory. This makes it easier for consumers
+to upgrade from v2 to v3.
+
 ## 3.0.1
 
 - Sort the imports and test invocations when generating aggregate tests. This
