@@ -1,5 +1,6 @@
 ## 3.0.3
 
+- Compatible with Dart 3.
 - For consumers using the browser aggregation feature, update the builder to
 also output the `dart_test.browser_aggregate.yaml` config file to the same
 location used in v2: the `test/` directory. This makes it easier for consumers
