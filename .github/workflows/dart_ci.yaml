@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: 2.18.7
+          sdk: 2.19.6
       - run: dart format --set-exit-if-changed -o none .
   test:
     runs-on: ubuntu-latest
