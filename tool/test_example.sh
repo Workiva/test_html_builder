@@ -6,7 +6,7 @@ cd example/project
 dart pub get
 dart run build_runner build --delete-conflicting-outputs
 dart run build_runner test
-dart test_html_builder:browser_aggregate_tests
+dart run test_html_builder:browser_aggregate_tests
 
 # These commands target a scenario where there is no build cache and someone
 # uses build filters to run a subset of tests.
