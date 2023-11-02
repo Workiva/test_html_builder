@@ -45,7 +45,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Upload Test Artifacts
-        uses: Workiva/gha-upload-test-reports@v1.0.3
+        uses: workiva/gha-upload-test-reports@v1.0.3
   docker-build:
     runs-on: ubuntu-latest
     name: "Build test_html_builder docker image"
