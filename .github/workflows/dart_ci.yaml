@@ -38,6 +38,11 @@ jobs:
       - run: dart analyze
       - run: dart test test/lib
       - run: dart test test/bin
+  skynet-test:
+    name: Skynet Tests
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
       - name: Upload Test Artifacts
         uses: Workiva/gha-upload-test-reports@v1.0.3
   example:
