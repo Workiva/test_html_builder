@@ -45,6 +45,16 @@ jobs:
         uses: actions/checkout@v3
       - name: Upload Test Artifacts
         uses: Workiva/gha-upload-test-reports@v1.0.3
+  docker-build:
+    runs-on: ubuntu-latest
+    name: "Build test_html_builder docker image"
+    container:
+      image: google/dart:2.13.4
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch Dart Dependencies
+        run: |
+          pub get
   example:
     runs-on: ubuntu-latest
     strategy:
