@@ -9,6 +9,10 @@ on:
     branches:
       - '*'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -23,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, stable, beta ]
+        sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
@@ -34,12 +38,16 @@ jobs:
       - run: dart analyze
       - run: dart test test/lib
       - run: dart test test/bin
+      - name: Upload Test Artifacts
+        uses: Workiva/gha-upload-test-reports@v1.0.5
+        with:
+          test-reports: test-reports/
   example:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, stable, beta ]
+        sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
