@@ -46,6 +46,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Upload Test Artifacts
         uses: workiva/gha-upload-test-reports@v1.0.3
+        with:
+          test-reports: test-reports/
   docker-build:
     runs-on: ubuntu-latest
     name: "Build test_html_builder docker image"
