@@ -9,10 +9,6 @@ on:
     branches:
       - '*'
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   format:
     runs-on: ubuntu-latest
