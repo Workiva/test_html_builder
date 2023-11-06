@@ -38,10 +38,6 @@ jobs:
       - run: dart analyze
       - run: dart test test/lib
       - run: dart test test/bin
-      - name: Upload Test Artifacts
-        uses: Workiva/gha-upload-test-reports@v1.0.5
-        with:
-          test-reports: /artifacts
   example:
     runs-on: ubuntu-latest
     strategy:
