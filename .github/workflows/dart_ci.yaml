@@ -5,6 +5,8 @@ on:
     branches:
       - 'master'
       - 'test_consume_*'
+    tags:
+      - '*'
   pull_request:
     branches:
       - '*'
@@ -13,7 +15,7 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: 2.19.6
@@ -23,9 +25,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, stable, beta ]
+        sdk: [ 2.19.6, stable, beta ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
@@ -34,14 +36,19 @@ jobs:
       - run: dart analyze
       - run: dart test test/lib
       - run: dart test test/bin
+      - uses: anchore/sbom-action@v0
+        if: ${{ matrix.sdk == 'stable' }}
+        with:
+          path: ./
+          format: cyclonedx-json
   example:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, stable, beta ]
+        sdk: [ 2.19.6, stable, beta ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
