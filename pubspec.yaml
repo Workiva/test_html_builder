@@ -31,6 +31,7 @@ dev_dependencies:
   pedantic: ^1.11.1
   test_descriptor: ^2.0.0
   test_process: ^2.0.2
+  workiva_analysis_options: ^1.4.1
 
   # If changes are made to `lib/src/config.dart` and regeneration is needed,
   # uncomment this and comment out the test_html_builder definition in
