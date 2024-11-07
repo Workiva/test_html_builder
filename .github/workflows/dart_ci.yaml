@@ -25,7 +25,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.19.6, stable, beta ]
+        sdk: [ 2.19.6 ]
+        # TODO: Add stable and beta sdk's as a separate effort (FEDX-1911)[https://jira.atl.workiva.net/browse/FEDX-1911]
+        # sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
@@ -46,7 +48,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.19.6, stable, beta ]
+        sdk: [ 2.19.6 ]
+        # TODO: Add stable and beta sdk's as a separate effort (FEDX-1911)[https://jira.atl.workiva.net/browse/FEDX-1911]
+        # sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
