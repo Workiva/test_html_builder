@@ -1,5 +1,4 @@
-include: package:pedantic/analysis_options.1.8.0.yaml
-
+include: package:workiva_analysis_options/v2.yaml
 analyzer:
   exclude:
     - example/**
@@ -7,9 +6,3 @@ analyzer:
   language:
     strict-inference: true
     strict-raw-types: true
-
-linter:
-  rules:
-    - avoid_types_on_closure_parameters
-    - prefer_void_to_null
-    - void_checks
