@@ -23,7 +23,10 @@ final argParser = ArgParser()
   ..addOption('build-args',
       help: 'Args to pass to the build runner process.\n'
           'Run "dart run build_runner build -h -v" to see all available '
-          'options.');
+          'options.')
+  ..addOption('test-args',
+      help: 'Args to pass to the dart test process.\n'
+          'Run "dart test -h" to see all available options.');
 
 enum Mode {
   // Print build and test args separated by `--`
@@ -62,6 +65,7 @@ void main(List<String> args) async {
 
   final bool? release = parsed['release'];
   final String? buildArgs = parsed['build-args'];
+  final String? testArgs = parsed['test-args'];
 
   buildAggregateTestYaml(mode, userBuildArgs: buildArgs);
   final testPaths = parseAggregateTestPaths(mode);
@@ -70,7 +74,8 @@ void main(List<String> args) async {
   } else if (mode == Mode.build) {
     await buildTests(testPaths, release: release, userBuildArgs: buildArgs);
   } else {
-    await runTests(testPaths, release: release, userBuildArgs: buildArgs);
+    await runTests(testPaths,
+        release: release, userBuildArgs: buildArgs, userTestArgs: testArgs);
   }
 }
 
@@ -187,7 +192,7 @@ Future<void> buildTests(List<String> testPaths,
 ///
 /// Includes `--release` if [release] is true.
 Future<void> runTests(List<String> testPaths,
-    {bool? release, String? userBuildArgs}) async {
+    {bool? release, String? userBuildArgs, String? userTestArgs}) async {
   final executable = 'dart';
   final args = [
     'run',
@@ -196,6 +201,7 @@ Future<void> runTests(List<String> testPaths,
     ...buildRunnerBuildArgs(testPaths,
         release: release, userBuildArgs: userBuildArgs),
     '--',
+    ...?userTestArgs?.split(' '),
     testPreset,
   ];
   stdout
