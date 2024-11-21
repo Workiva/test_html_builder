@@ -333,9 +333,39 @@ class DartTestYamlBuilder extends Builder {
         AssetId(buildStep.inputId.package, 'dart_test.browser_aggregate.yaml');
     await buildStep.writeAsString(outputId, contents.toString());
 
-    final backwardsCompatOutputId = AssetId(
-        buildStep.inputId.package, 'test/dart_test.browser_aggregate.yaml');
-    await buildStep.writeAsString(backwardsCompatOutputId, contents.toString());
+    var shouldWriteBackwardsCompatOutput = false;
+    try {
+      final dartTestYamlId =
+          AssetId(buildStep.inputId.package, 'dart_test.yaml');
+      final dartTestYaml = await buildStep.readAsString(dartTestYamlId);
+      if (dartTestYaml.contains('test/dart_test.browser_aggregate.yaml')) {
+        log.warning(
+            'Found `test/dart_test.browser_aggregate.yaml` in `dart_test.yaml`, will generate it for backwards-compatibility.\n'
+            'Please update your `dart_test.yaml` to include `dart_test.browser_aggregate.yaml` instead.');
+        shouldWriteBackwardsCompatOutput = true;
+      } else {
+        log.fine(
+            'No `test/dart_test.browser_aggregate.yaml` found in `dart_test.yaml`, skipping backwards-compatible generation.');
+      }
+    } on AssetNotFoundException catch (_) {
+      log.fine(
+          'No `dart_test.yaml` found, skipping backwards-compatible generation of `test/dart_test.browser_aggregate.yaml`.');
+    } catch (e) {
+      log.fine(
+          'Error reading `dart_test.yaml`, skipping backwards-compatible generation of `test/dart_test.browser_aggregate.yaml`.',
+          e);
+    }
+
+    if (shouldWriteBackwardsCompatOutput) {
+      final backwardsCompatOutputId = AssetId(
+        buildStep.inputId.package,
+        'test/dart_test.browser_aggregate.yaml',
+      );
+      await buildStep.writeAsString(
+        backwardsCompatOutputId,
+        contents.toString(),
+      );
+    }
   }
 }
 
