@@ -339,8 +339,9 @@ class DartTestYamlBuilder extends Builder {
           AssetId(buildStep.inputId.package, 'dart_test.yaml');
       final dartTestYaml = await buildStep.readAsString(dartTestYamlId);
       if (dartTestYaml.contains('test/dart_test.browser_aggregate.yaml')) {
-        log.fine(
-            'Found `test/dart_test.browser_aggregate.yaml` in `dart_test.yaml`, will generate it for backwards-compatibility.');
+        log.warning(
+            'Found `test/dart_test.browser_aggregate.yaml` in `dart_test.yaml`, will generate it for backwards-compatibility.\n'
+            'Please update your `dart_test.yaml` to include `dart_test.browser_aggregate.yaml` instead.');
         shouldWriteBackwardsCompatOutput = true;
       } else {
         log.fine(
