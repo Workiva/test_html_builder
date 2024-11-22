@@ -1,9 +1,3 @@
-## 3.1.0
-
-- The `test/dart_test.browser_aggregate.yaml` file was previously always
-generated for backwards-compatibility. With this release, it is only generated
-if a reference to it is found in `dart_test.yaml`.
-
 ## 3.0.3
 
 - Compatible with Dart 3.
