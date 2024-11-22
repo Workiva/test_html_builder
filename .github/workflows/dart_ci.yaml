@@ -36,7 +36,8 @@ jobs:
       - run: dart pub get
       - run: dart run dependency_validator
       - run: dart analyze
-      - run: dart test
+      - run: dart test test/lib
+      - run: dart test test/bin
       - uses: anchore/sbom-action@v0
         if: ${{ matrix.sdk == 'stable' }}
         with:
