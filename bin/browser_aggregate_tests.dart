@@ -171,6 +171,7 @@ Future<void> buildTests(List<String> testPaths,
     'run',
     'build_runner',
     'build',
+    '--delete-conflicting-outputs',
     ...buildRunnerBuildArgs(testPaths,
         release: release, userBuildArgs: userBuildArgs),
   ];
