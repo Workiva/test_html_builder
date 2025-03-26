@@ -25,7 +25,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Add stable and beta sdk's as a separate effort (FEDX-1911)[https://jira.atl.workiva.net/browse/FEDX-1911]
         sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +46,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Add stable and beta sdk's as a separate effort (FEDX-1911)[https://jira.atl.workiva.net/browse/FEDX-1911]
         sdk: [ 2.19.6, stable, beta ]
     steps:
       - uses: actions/checkout@v4
