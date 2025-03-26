@@ -95,7 +95,7 @@ void main() {
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'dart run build_runner build --build-filter=test/templates/default_template.browser_aggregate_test.**'),
+              'dart run build_runner build --delete-conflicting-outputs --build-filter=test/templates/default_template.browser_aggregate_test.**'),
           emitsThrough(contains('Succeeded')),
         ]));
     await process.shouldExit(0);
@@ -116,7 +116,7 @@ void main() {
           emitsThrough('Reading browser aggregate test config...'),
           emitsThrough('Found 1 aggregate tests to run.'),
           emitsThrough(
-              'dart run build_runner build -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**'),
+              'dart run build_runner build --delete-conflicting-outputs -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**'),
           emitsThrough(contains('Succeeded')),
         ]));
     await process.shouldExit(0);
