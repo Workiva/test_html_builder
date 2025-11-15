@@ -1,3 +1,9 @@
+[![Slack Channel](https://img.shields.io/badge/Support_Channel-Slack-purple)](https://slack.com/app_redirect?channel=support-frontend-dx)
+[![Maintainer](https://img.shields.io/badge/maintainer-FEDX-silver)](https://wiki.atl.workiva.net/display/FEF/Frontend+Dev+Experience)
+[![Documentation](https://img.shields.io/badge/Additional_Documentation-blue)](https://frontend.workiva.dev)
+[![CI](https://github.com/Workiva/test_html_builder/actions/workflows/dart_ci.yaml/badge.svg?branch=master)](https://github.com/Workiva/test_html_builder/actions/workflows/dart_ci.yaml)
+[![codecov](https://codecov.io/gh/Workiva/test_html_builder/branch/master/graph/badge.svg?token=7S7VXS0TSJ)](https://codecov.io/gh/Workiva/test_html_builder)
+
 # `test_html_builder`
 
 A Dart builder that uses templates to generate HTML files for dart tests. Useful
