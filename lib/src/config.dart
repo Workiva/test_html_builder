@@ -24,25 +24,28 @@ import 'package:json_annotation/json_annotation.dart';
 part 'config.g.dart';
 
 @JsonSerializable(
-    anyMap: true,
-    checked: true,
-    disallowUnrecognizedKeys: true,
-    fieldRename: FieldRename.snake)
+  anyMap: true,
+  checked: true,
+  disallowUnrecognizedKeys: true,
+  fieldRename: FieldRename.snake,
+)
 class TestHtmlBuilderConfig {
-  TestHtmlBuilderConfig(
-      {bool? browserAggregation,
-      String? randomizeOrderingSeed,
-      Map<String, List<String>>? templates})
-      : browserAggregation = browserAggregation ?? false,
-        randomizeOrderingSeed = randomizeOrderingSeed,
-        templates = templates ?? {};
+  TestHtmlBuilderConfig({
+    bool? browserAggregation,
+    String? randomizeOrderingSeed,
+    Map<String, List<String>>? templates,
+  }) : browserAggregation = browserAggregation ?? false,
+       randomizeOrderingSeed = randomizeOrderingSeed,
+       templates = templates ?? {};
 
   factory TestHtmlBuilderConfig.fromBuilderOptions(BuilderOptions options) {
     final config = TestHtmlBuilderConfig.fromJson(options.config);
     for (final path in config.templates.keys) {
       if (!path.startsWith('./test/') && !path.startsWith('test/')) {
-        throw StateError('Invalid template path: $path\n'
-            'Every test html template must be located in the `test/` directory.');
+        throw StateError(
+          'Invalid template path: $path\n'
+          'Every test html template must be located in the `test/` directory.',
+        );
       }
     }
     return config;
@@ -53,7 +56,7 @@ class TestHtmlBuilderConfig {
       return _$TestHtmlBuilderConfigFromJson(json);
     } on CheckedFromJsonException catch (e) {
       final lines = <String>[
-        'Could not parse the options provided for `test_html_builder`.'
+        'Could not parse the options provided for `test_html_builder`.',
       ];
 
       final key = e.key;
@@ -81,8 +84,9 @@ class TestHtmlBuilderConfig {
   final Map<String, List<String>> templates;
 
   late final Map<String, Iterable<Glob>> templateGlobs = templates.map(
-      (key, globPatterns) =>
-          MapEntry(key, globPatterns.map((pattern) => Glob(pattern))));
+    (key, globPatterns) =>
+        MapEntry(key, globPatterns.map((pattern) => Glob(pattern))),
+  );
 
   Map<String, dynamic> toJson() => _$TestHtmlBuilderConfigToJson(this);
 }

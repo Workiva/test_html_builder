@@ -19,7 +19,7 @@ void main() {
         'randomize_ordering_seed': 'random',
         'templates': {
           'test/foo_template.html': ['test/**_test.dart'],
-        }
+        },
       });
       final config = TestHtmlBuilderConfig.fromBuilderOptions(options);
       expect(config.browserAggregation, isTrue);
@@ -28,37 +28,49 @@ void main() {
         'test/foo_template.html': ['test/**_test.dart'],
       });
       expect(
-          config.templateGlobs['test/foo_template.html']!.first
-              .matches('test/foo_test.dart'),
-          isTrue);
+        config.templateGlobs['test/foo_template.html']!.first.matches(
+          'test/foo_test.dart',
+        ),
+        isTrue,
+      );
     });
 
     test('throws StateError if any templates are not in test/', () {
       final options = BuilderOptions({
         'templates': {
           'lib/bad_template.html': ['test/**_test.dart'],
-        }
+        },
       });
       expect(
-          () => TestHtmlBuilderConfig.fromBuilderOptions(options),
-          throwsA(isA<StateError>().having(
-              (e) => e.message, 'message', contains('lib/bad_template.html'))));
+        () => TestHtmlBuilderConfig.fromBuilderOptions(options),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('lib/bad_template.html'),
+          ),
+        ),
+      );
     });
 
     test('throws StateError if unsupported option key is provided', () {
       final options = BuilderOptions({
         'badkey': 'foo',
       });
-      expect(() => TestHtmlBuilderConfig.fromBuilderOptions(options),
-          throwsStateError);
+      expect(
+        () => TestHtmlBuilderConfig.fromBuilderOptions(options),
+        throwsStateError,
+      );
     });
 
     test('throws StateError if templates format is invalid', () {
       final options = BuilderOptions({
         'templates': ['invalid format'],
       });
-      expect(() => TestHtmlBuilderConfig.fromBuilderOptions(options),
-          throwsStateError);
+      expect(
+        () => TestHtmlBuilderConfig.fromBuilderOptions(options),
+        throwsStateError,
+      );
     });
   });
 }

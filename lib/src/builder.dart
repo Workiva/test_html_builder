@@ -42,7 +42,7 @@ class TestHtmlBuilder implements Builder {
     r'$package$': [
       'test/templates/default_template.html',
       'test/test_html_builder_config.json',
-    ]
+    ],
   };
 
   @override
@@ -50,7 +50,9 @@ class TestHtmlBuilder implements Builder {
     // Write the default template for any browser tests that don't match one of
     // the templates defined in the project's config.
     final defaultTemplateId = AssetId(
-        buildStep.inputId.package, 'test/templates/default_template.html');
+      buildStep.inputId.package,
+      'test/templates/default_template.html',
+    );
     await buildStep.writeAsString(defaultTemplateId, '''<!doctype html>
 <html>
   <head>
@@ -63,7 +65,9 @@ class TestHtmlBuilder implements Builder {
 
     // Write the builder options so they can be used by the builders below.
     final configId = AssetId(
-        buildStep.inputId.package, 'test/test_html_builder_config.json');
+      buildStep.inputId.package,
+      'test/test_html_builder_config.json',
+    );
     await buildStep.writeAsString(configId, json.encode(_config));
   }
 }
@@ -81,7 +85,8 @@ class AggregateTestBuilder extends Builder {
       log.fine('browser aggregation disabled');
       if (config.randomizeOrderingSeed != null) {
         log.warning(
-            '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.');
+          '`randomize_ordering_seed` option is set, but `browser_aggregation` is not enabled so it has no effect.',
+        );
       }
       return;
     }
@@ -92,7 +97,8 @@ class AggregateTestBuilder extends Builder {
         ? [Glob('test/**_test.dart')]
         : config.templateGlobs[templatePath] ?? [];
     log.fine(
-        'Test globs found for template: ${buildStep.inputId}:\n${testGlobs.join('\n')}');
+      'Test globs found for template: ${buildStep.inputId}:\n${testGlobs.join('\n')}',
+    );
 
     final higherPrecedenceGlobs = <Glob>[];
     if (isDefault) {
@@ -116,14 +122,18 @@ class AggregateTestBuilder extends Builder {
         // then it will be included in that aggregate test.
         if (higherPrecedenceGlobs.any((g) => g.matches(id.path))) continue;
 
-        final hasCustomHtml =
-            await buildStep.canRead(id.changeExtension('.custom.html'));
+        final hasCustomHtml = await buildStep.canRead(
+          id.changeExtension('.custom.html'),
+        );
         if (hasCustomHtml) continue;
 
         Metadata testMetadata;
         try {
           testMetadata = parseMetadata(
-              id.path, await buildStep.readAsString(id), _platformVariables);
+            id.path,
+            await buildStep.readAsString(id),
+            _platformVariables,
+          );
         } catch (e, stack) {
           log.severe('Error parsing test metadata: ${id.path}', e, stack);
           continue;
@@ -132,8 +142,10 @@ class AggregateTestBuilder extends Builder {
         if (!_isBrowserTest(testMetadata)) continue;
 
         final prefix = _importPrefixForTest(id.path);
-        final path =
-            p.relative(id.path, from: p.dirname(buildStep.inputId.path));
+        final path = p.relative(
+          id.path,
+          from: p.dirname(buildStep.inputId.path),
+        );
         imports.add("import '$path' as $prefix;");
         mains.add("  $prefix.main();");
       }
@@ -151,15 +163,18 @@ class AggregateTestBuilder extends Builder {
     if (seed != null) {
       log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
       mains.shuffle(Random(seed));
-      mains.insert(0,
-          "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$seed\"`');");
+      mains.insert(
+        0,
+        "print('${buildStep.inputId.path} built with `randomize_ordering_seed: \"$seed\"`');",
+      );
     } else {
       // If the test order was not shuffled, sort them for the same reason we
       // sort the imports.
       mains.sort();
     }
-    final globalLanguageVersion =
-        Version.parse(Platform.version.split(' ').first);
+    final globalLanguageVersion = Version.parse(
+      Platform.version.split(' ').first,
+    );
     final contents = DartFormatter(languageVersion: globalLanguageVersion)
         .format('''@TestOn('browser')
 import 'package:test/test.dart';
@@ -171,18 +186,19 @@ ${mains.join('\n')}
 }
 ''');
 
-    final outputId =
-        buildStep.inputId.changeExtension('.browser_aggregate_test.dart');
+    final outputId = buildStep.inputId.changeExtension(
+      '.browser_aggregate_test.dart',
+    );
     await buildStep.writeAsString(outputId, contents);
   }
 
   final _browserRuntimes = Runtime.builtIn.where((r) => r.isBrowser == true);
 
   Set<String> get _platformVariables => [
-        Runtime.vm,
-        Runtime.nodeJS,
-        ..._browserRuntimes,
-      ].map((r) => r.identifier).toSet();
+    Runtime.vm,
+    Runtime.nodeJS,
+    ..._browserRuntimes,
+  ].map((r) => r.identifier).toSet();
 
   String _importPrefixForTest(String path) {
     // Remove `test/` segment.
@@ -192,8 +208,9 @@ ${mains.join('\n')}
     return result.replaceAll(p.separator, '_').replaceAll('.', '_');
   }
 
-  bool _isBrowserTest(Metadata testMetadata) => _browserRuntimes
-      .any((r) => testMetadata.testOn.evaluate(SuitePlatform(r)));
+  bool _isBrowserTest(Metadata testMetadata) => _browserRuntimes.any(
+    (r) => testMetadata.testOn.evaluate(SuitePlatform(r)),
+  );
 
   Future<TestHtmlBuilderConfig> _getConfig(BuildStep buildStep) async =>
       __config ??= await decodeConfig(buildStep);
@@ -235,10 +252,14 @@ class TemplateBuilder implements Builder {
   static AssetId getHtmlId(AssetId assetId) => assetId.changeExtension('.html');
 
   AssetId? getTemplateId(
-      Map<String, Iterable<Glob>> templates, AssetId assetId) {
+    Map<String, Iterable<Glob>> templates,
+    AssetId assetId,
+  ) {
     if (assetId.path.endsWith('.browser_aggregate_test.dart')) {
-      return AssetId(assetId.package,
-          assetId.path.replaceFirst('.browser_aggregate_test.dart', '.html'));
+      return AssetId(
+        assetId.package,
+        assetId.path.replaceFirst('.browser_aggregate_test.dart', '.html'),
+      );
     }
 
     for (final templatePath in templates.keys) {
@@ -258,7 +279,9 @@ class TemplateBuilder implements Builder {
     if (await buildStep.canRead(customHtmlId)) {
       log.fine('Custom html found for ${buildStep.inputId.path}');
       await buildStep.writeAsBytes(
-          htmlId, await buildStep.readAsBytes(customHtmlId));
+        htmlId,
+        await buildStep.readAsBytes(customHtmlId),
+      );
       return;
     }
 
@@ -273,11 +296,13 @@ class TemplateBuilder implements Builder {
     }
 
     log.fine(
-        'Generating html for ${buildStep.inputId.path} from template at ${templateId.path}');
+      'Generating html for ${buildStep.inputId.path} from template at ${templateId.path}',
+    );
     var htmlContents = await buildStep.readAsString(templateId);
     if ('{{testScript}}'.allMatches(htmlContents).length != 1) {
       log.severe(
-          'Test html template must contain exactly one `{{testScript}}` placeholder: ${templateId.path}');
+        'Test html template must contain exactly one `{{testScript}}` placeholder: ${templateId.path}',
+      );
       return;
     }
 
@@ -313,39 +338,50 @@ class DartTestYamlBuilder extends Builder {
     }
 
     log.fine('Building dart_test.browser_aggregate.yaml');
-    final contents = StringBuffer()..writeln('''presets:
+    final contents = StringBuffer()
+      ..writeln('''presets:
   browser-aggregate:
     platforms: [chrome]
     paths:''');
 
-    final aggregateTests = buildStep
-        .findAssets(Glob('test/**_template.browser_aggregate_test.dart'));
+    final aggregateTests = buildStep.findAssets(
+      Glob('test/**_template.browser_aggregate_test.dart'),
+    );
     await for (final testId in aggregateTests) {
       log.fine('Found aggregate test: ${testId.path}');
       contents.writeln('      - ${testId.path}');
     }
 
-    await for (final customHtml
-        in buildStep.findAssets(Glob('test/**_test.custom.html'))) {
+    await for (final customHtml in buildStep.findAssets(
+      Glob('test/**_test.custom.html'),
+    )) {
       log.fine('Found custom HTML test: ${customHtml.path}');
-      final customTestPath =
-          customHtml.path.replaceFirst('_test.custom.html', '_test.dart');
+      final customTestPath = customHtml.path.replaceFirst(
+        '_test.custom.html',
+        '_test.dart',
+      );
       contents.writeln('      - $customTestPath');
     }
 
-    final outputId =
-        AssetId(buildStep.inputId.package, 'dart_test.browser_aggregate.yaml');
+    final outputId = AssetId(
+      buildStep.inputId.package,
+      'dart_test.browser_aggregate.yaml',
+    );
     await buildStep.writeAsString(outputId, contents.toString());
 
     final backwardsCompatOutputId = AssetId(
-        buildStep.inputId.package, 'test/dart_test.browser_aggregate.yaml');
+      buildStep.inputId.package,
+      'test/dart_test.browser_aggregate.yaml',
+    );
     await buildStep.writeAsString(backwardsCompatOutputId, contents.toString());
   }
 }
 
 Future<TestHtmlBuilderConfig> decodeConfig(BuildStep buildStep) async {
-  final id =
-      AssetId(buildStep.inputId.package, 'test/test_html_builder_config.json');
+  final id = AssetId(
+    buildStep.inputId.package,
+    'test/test_html_builder_config.json',
+  );
   final contents = await buildStep.readAsString(id);
   return TestHtmlBuilderConfig.fromJson(json.decode(contents));
 }
