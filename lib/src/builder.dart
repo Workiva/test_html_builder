@@ -161,7 +161,9 @@ class AggregateTestBuilder extends Builder {
 
     final seed = _getRandomSeed();
     if (seed != null) {
-      log.info('Shuffling test order with `randomize_ordering_seed: $seed`\n');
+      log.info(
+        'Shuffling test order with `randomize_ordering_seed: $seed`\n',
+      );
       mains.shuffle(Random(seed));
       mains.insert(
         0,
@@ -373,7 +375,10 @@ class DartTestYamlBuilder extends Builder {
       buildStep.inputId.package,
       'test/dart_test.browser_aggregate.yaml',
     );
-    await buildStep.writeAsString(backwardsCompatOutputId, contents.toString());
+    await buildStep.writeAsString(
+      backwardsCompatOutputId,
+      contents.toString(),
+    );
   }
 }
 

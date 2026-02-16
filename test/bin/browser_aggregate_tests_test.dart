@@ -25,13 +25,16 @@ dev_dependencies:
     path: ${p.current}
 '''),
       if (browserAggregation)
-        d.file(customBuildYaml ? 'build.custom.yaml' : 'build.yaml', '''targets:
+        d.file(
+          customBuildYaml ? 'build.custom.yaml' : 'build.yaml',
+          '''targets:
   \$default:
     builders:
       test_html_builder:
         options:
           browser_aggregation: true
-'''),
+''',
+        ),
       if (browserAggregation)
         d.file('dart_test.yaml', 'include: dart_test.browser_aggregate.yaml'),
       d.dir('test', [
@@ -210,7 +213,9 @@ void main() {
     expect(
       process.stdout,
       emits(
-        contains('browser aggregation is not enabled. Update your build.yaml'),
+        contains(
+          'browser aggregation is not enabled. Update your build.yaml',
+        ),
       ),
     );
     await process.shouldExit(isNot(0));

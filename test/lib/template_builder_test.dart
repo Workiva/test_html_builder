@@ -169,7 +169,9 @@ void main() {
           emits(
             severeLogOf(
               allOf(
-                contains('template must contain exactly one `{{testScript}}`'),
+                contains(
+                  'template must contain exactly one `{{testScript}}`',
+                ),
                 contains('test/template.html'),
               ),
             ),

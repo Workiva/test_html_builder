@@ -146,7 +146,9 @@ targets:
   );
   late List<String> paths;
   try {
-    paths = List<String>.from(config['presets']['browser-aggregate']['paths']);
+    paths = List<String>.from(
+      config['presets']['browser-aggregate']['paths'],
+    );
   } catch (e, stack) {
     stdout
       ..writeln('Failed to read test paths from "${configFile.uri}"')
