@@ -19,7 +19,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: 3.11.0
-      - run: dart format --set-exit-if-changed -o none .
+      - run: dart format --set-exit-if-changed -o none --show all .
   test:
     runs-on: ubuntu-latest
     strategy:
