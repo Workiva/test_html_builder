@@ -158,9 +158,10 @@ class AggregateTestBuilder extends Builder {
       // sort the imports.
       mains.sort();
     }
-final globalLanguageVersion =
+    final globalLanguageVersion =
         Version.parse(Platform.version.split(' ').first);
-    final contents = DartFormatter(languageVersion: globalLanguageVersion).format('''@TestOn('browser')
+    final contents = DartFormatter(languageVersion: globalLanguageVersion)
+        .format('''@TestOn('browser')
 import 'package:test/test.dart';
 
 ${imports.join('\n')}
