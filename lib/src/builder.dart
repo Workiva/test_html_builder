@@ -14,12 +14,14 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
+import 'package:pub_semver/pub_semver.dart';
 // This import is deprecated to discourage its use, but the build_test package
 // uses it for the same reason we're using it here. So if they choose to get rid
 // of this import, they'll presumably have a plan for a different way to
@@ -156,8 +158,9 @@ class AggregateTestBuilder extends Builder {
       // sort the imports.
       mains.sort();
     }
-
-    final contents = DartFormatter().format('''@TestOn('browser')
+final globalLanguageVersion =
+        Version.parse(Platform.version.split(' ').first);
+    final contents = DartFormatter(languageVersion: globalLanguageVersion).format('''@TestOn('browser')
 import 'package:test/test.dart';
 
 ${imports.join('\n')}
