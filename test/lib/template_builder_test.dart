@@ -122,34 +122,21 @@ void main() {
       );
     });
 
-    test('logs SEVERE if template cannot be read', () async {
+    test('does not output .html if template cannot be read', () async {
       final config = TestHtmlBuilderConfig(
         templates: {
           'test/template.html': ['test/**_test.dart'],
         },
       );
       final builder = TemplateBuilder();
-      final logs = recordLogs(
-        () => testBuilder(builder, {
+      await testBuilder(builder, {
           'a|test/test_html_builder_config.json': jsonEncode(config),
           'a|test/foo_test.dart': '',
-        }),
-      );
-      expect(
-        logs,
-        emits(
-          severeLogOf(
-            allOf(
-              contains('Could not read template'),
-              contains('test/template.html'),
-            ),
-          ),
-        ),
-      );
+        }, outputs: {});
     });
 
     test(
-      'logs SEVERE if template does not contain `{{testScript}}` token',
+      'does not output .html if template does not contain `{{testScript}}` token',
       () async {
         final config = TestHtmlBuilderConfig(
           templates: {
@@ -157,26 +144,11 @@ void main() {
           },
         );
         final builder = TemplateBuilder();
-        final logs = recordLogs(
-          () => testBuilder(builder, {
+        await testBuilder(builder, {
             'a|test/test_html_builder_config.json': jsonEncode(config),
             'a|test/foo_test.dart': '',
             'a|test/template.html': 'MISSING TOKEN',
-          }),
-        );
-        expect(
-          logs,
-          emits(
-            severeLogOf(
-              allOf(
-                contains(
-                  'template must contain exactly one `{{testScript}}`',
-                ),
-                contains('test/template.html'),
-              ),
-            ),
-          ),
-        );
+          }, outputs: {});
       },
     );
   });

@@ -110,13 +110,13 @@ void main() {
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs --build-filter=dart_test.browser_aggregate.yaml',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
         emitsThrough('Reading browser aggregate test config...'),
         emitsThrough('Found 1 aggregate tests to run.'),
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs --build-filter=test/templates/default_template.browser_aggregate_test.**',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
       ]),
     );
     await process.shouldExit(0);
@@ -137,13 +137,13 @@ void main() {
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs -c custom --build-filter=dart_test.browser_aggregate.yaml',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
         emitsThrough('Reading browser aggregate test config...'),
         emitsThrough('Found 1 aggregate tests to run.'),
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs -c custom --release --build-filter=test/templates/default_template.browser_aggregate_test.**',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
       ]),
     );
     await process.shouldExit(0);
@@ -163,7 +163,7 @@ void main() {
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs --build-filter=dart_test.browser_aggregate.yaml',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
         emitsThrough('Reading browser aggregate test config...'),
         emitsThrough('Found 1 aggregate tests to run.'),
         emitsThrough(
@@ -191,7 +191,7 @@ void main() {
         emitsThrough(
           'dart run build_runner build --delete-conflicting-outputs --release -c custom --build-filter=dart_test.browser_aggregate.yaml',
         ),
-        emitsThrough(contains('Succeeded')),
+        emitsThrough(contains('Built with build_runner/jit')),
         emitsThrough('Reading browser aggregate test config...'),
         emitsThrough('Found 1 aggregate tests to run.'),
         emitsThrough(

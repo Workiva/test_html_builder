@@ -17,7 +17,7 @@ void main() {
     await testBuilder(
       builder,
       {
-        r'a|$package$': '',
+        'a|pubspec.yaml': 'name: a',
       },
       outputs: {
         'a|test/templates/default_template.html': '''<!doctype html>
