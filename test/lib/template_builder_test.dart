@@ -130,9 +130,9 @@ void main() {
       );
       final builder = TemplateBuilder();
       await testBuilder(builder, {
-          'a|test/test_html_builder_config.json': jsonEncode(config),
-          'a|test/foo_test.dart': '',
-        }, outputs: {});
+        'a|test/test_html_builder_config.json': jsonEncode(config),
+        'a|test/foo_test.dart': '',
+      }, outputs: {});
     });
 
     test(
@@ -145,10 +145,10 @@ void main() {
         );
         final builder = TemplateBuilder();
         await testBuilder(builder, {
-            'a|test/test_html_builder_config.json': jsonEncode(config),
-            'a|test/foo_test.dart': '',
-            'a|test/template.html': 'MISSING TOKEN',
-          }, outputs: {});
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/foo_test.dart': '',
+          'a|test/template.html': 'MISSING TOKEN',
+        }, outputs: {});
       },
     );
   });
