@@ -3,6 +3,6 @@ analyzer:
   exclude:
     - example/**
     - lib/**.g.dart
-  language:
-    strict-inference: true
-    strict-raw-types: true
+
+formatter:
+  trailing_commas: preserve

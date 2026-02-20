@@ -8,14 +8,19 @@ import 'package:test_html_builder/src/config.dart';
 
 void main() {
   test('TestHtmlBuilder', () async {
-    final config = TestHtmlBuilderConfig(templates: {
-      'test/template.html': ['test/foo_test.dart'],
-    });
+    final config = TestHtmlBuilderConfig(
+      templates: {
+        'test/template.html': ['test/foo_test.dart'],
+      },
+    );
     final builder = TestHtmlBuilder(config);
-    await testBuilder(builder, {
-      r'a|$package$': '',
-    }, outputs: {
-      'a|test/templates/default_template.html': '''<!doctype html>
+    await testBuilder(
+      builder,
+      {
+        'a|pubspec.yaml': 'name: a',
+      },
+      outputs: {
+        'a|test/templates/default_template.html': '''<!doctype html>
 <html>
   <head>
     <title>{{testName}} Test</title>
@@ -24,7 +29,8 @@ void main() {
   </head>
 </html>
 ''',
-      'a|test/test_html_builder_config.json': jsonEncode(config),
-    });
+        'a|test/test_html_builder_config.json': jsonEncode(config),
+      },
+    );
   });
 }

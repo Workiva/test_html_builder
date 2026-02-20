@@ -18,14 +18,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: 2.19.6
+          sdk: 3.11.0
+      - run: dart pub upgrade
       - run: dart format --set-exit-if-changed -o none .
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.19.6, stable, beta ]
+        sdk: [ stable ]
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
@@ -46,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.19.6, stable, beta ]
+        sdk: [ stable ]
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1

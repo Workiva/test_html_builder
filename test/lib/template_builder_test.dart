@@ -33,9 +33,11 @@ void main() {
     });
 
     test('does nothing if template does not match asset', () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/template.html': ['test/no_match.dart'],
-      });
+      final config = TestHtmlBuilderConfig(
+        templates: {
+          'test/template.html': ['test/no_match.dart'],
+        },
+      );
       final builder = TemplateBuilder();
       await testBuilder(builder, {
         'a|test/test_html_builder_config.json': jsonEncode(config),
@@ -45,98 +47,141 @@ void main() {
     });
 
     test('outputs .html if template matches asset', () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/template.html': ['test/**_test.dart'],
-      });
+      final config = TestHtmlBuilderConfig(
+        templates: {
+          'test/template.html': ['test/**_test.dart'],
+        },
+      );
       final builder = TemplateBuilder();
-      await testBuilder(builder, {
-        'a|test/test_html_builder_config.json': jsonEncode(config),
-        'a|test/bar_test.dart': '',
-        'a|test/foo_test.dart': '',
-        'a|test/template.html': '<html><head>{{testScript}}</head></html>',
-      }, outputs: {
-        'a|test/bar_test.html':
-            '''<html><head><link rel="x-dart-test" href="bar_test.dart"></head></html>''',
-        'a|test/foo_test.html':
-            '''<html><head><link rel="x-dart-test" href="foo_test.dart"></head></html>''',
-      });
+      await testBuilder(
+        builder,
+        {
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/bar_test.dart': '',
+          'a|test/foo_test.dart': '',
+          'a|test/template.html': '<html><head>{{testScript}}</head></html>',
+        },
+        outputs: {
+          'a|test/bar_test.html':
+              '''<html><head><link rel="x-dart-test" href="bar_test.dart"></head></html>''',
+          'a|test/foo_test.html':
+              '''<html><head><link rel="x-dart-test" href="foo_test.dart"></head></html>''',
+        },
+      );
     });
 
-    test('chooses first template that matches asset if multiple match',
-        () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/a_template.html': ['test/bar_test.dart'],
-        'test/b_template.html': ['test/**_test.dart'],
-      });
+    test('chooses first template that matches asset if multiple match', () async {
+      final config = TestHtmlBuilderConfig(
+        templates: {
+          'test/a_template.html': ['test/bar_test.dart'],
+          'test/b_template.html': ['test/**_test.dart'],
+        },
+      );
       final builder = TemplateBuilder();
-      await testBuilder(builder, {
-        'a|test/test_html_builder_config.json': jsonEncode(config),
-        'a|test/bar_test.dart': '',
-        'a|test/foo_test.dart': '',
-        'a|test/a_template.html':
-            '<html><head><!-- A -->{{testScript}}</head></html>',
-        'a|test/b_template.html':
-            '<html><head><!-- B -->{{testScript}}</head></html>',
-      }, outputs: {
-        'a|test/bar_test.html':
-            '''<html><head><!-- A --><link rel="x-dart-test" href="bar_test.dart"></head></html>''',
-        'a|test/foo_test.html':
-            '''<html><head><!-- B --><link rel="x-dart-test" href="foo_test.dart"></head></html>''',
-      });
+      await testBuilder(
+        builder,
+        {
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/bar_test.dart': '',
+          'a|test/foo_test.dart': '',
+          'a|test/a_template.html':
+              '<html><head><!-- A -->{{testScript}}</head></html>',
+          'a|test/b_template.html':
+              '<html><head><!-- B -->{{testScript}}</head></html>',
+        },
+        outputs: {
+          'a|test/bar_test.html':
+              '''<html><head><!-- A --><link rel="x-dart-test" href="bar_test.dart"></head></html>''',
+          'a|test/foo_test.html':
+              '''<html><head><!-- B --><link rel="x-dart-test" href="foo_test.dart"></head></html>''',
+        },
+      );
     });
 
     test('copies .custom.html asset if found', () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/template.html': ['test/**_test.dart'],
-      });
+      final config = TestHtmlBuilderConfig(
+        templates: {
+          'test/template.html': ['test/**_test.dart'],
+        },
+      );
       final builder = TemplateBuilder();
-      await testBuilder(builder, {
-        'a|test/test_html_builder_config.json': jsonEncode(config),
-        'a|test/bar_test.dart': '',
-        'a|test/bar_test.custom.html': 'CUSTOM BAR TEST',
-        'a|test/foo_test.dart': '',
-        'a|test/foo_test.custom.html': 'CUSTOM FOO TEST',
-        'a|test/template.html': '<html><head>{{testScript}}</head></html>',
-      }, outputs: {
-        'a|test/bar_test.html': 'CUSTOM BAR TEST',
-        'a|test/foo_test.html': 'CUSTOM FOO TEST',
-      });
+      await testBuilder(
+        builder,
+        {
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/bar_test.dart': '',
+          'a|test/bar_test.custom.html': 'CUSTOM BAR TEST',
+          'a|test/foo_test.dart': '',
+          'a|test/foo_test.custom.html': 'CUSTOM FOO TEST',
+          'a|test/template.html': '<html><head>{{testScript}}</head></html>',
+        },
+        outputs: {
+          'a|test/bar_test.html': 'CUSTOM BAR TEST',
+          'a|test/foo_test.html': 'CUSTOM FOO TEST',
+        },
+      );
     });
 
     test('logs SEVERE if template cannot be read', () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/template.html': ['test/**_test.dart'],
-      });
+      final config = TestHtmlBuilderConfig(
+        templates: {
+          'test/template.html': ['test/**_test.dart'],
+        },
+      );
       final builder = TemplateBuilder();
-      final logs = recordLogs(() => testBuilder(builder, {
-            'a|test/test_html_builder_config.json': jsonEncode(config),
-            'a|test/foo_test.dart': '',
-          }));
+      final logs = <Object>[];
+      await testBuilder(
+        builder,
+        {
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/foo_test.dart': '',
+        },
+        onLog: logs.add,
+      );
       expect(
-          logs,
-          emits(severeLogOf(allOf(
-            contains('Could not read template'),
-            contains('test/template.html'),
-          ))));
+        logs,
+        contains(
+          severeLogOf(
+            allOf(
+              contains('Could not read template'),
+              contains('test/template.html'),
+            ),
+          ),
+        ),
+      );
     });
 
-    test('logs SEVERE if template does not contain `{{testScript}}` token',
-        () async {
-      final config = TestHtmlBuilderConfig(templates: {
-        'test/template.html': ['test/**_test.dart'],
-      });
-      final builder = TemplateBuilder();
-      final logs = recordLogs(() => testBuilder(builder, {
+    test(
+      'logs SEVERE if template does not contain `{{testScript}}` token',
+      () async {
+        final config = TestHtmlBuilderConfig(
+          templates: {
+            'test/template.html': ['test/**_test.dart'],
+          },
+        );
+        final builder = TemplateBuilder();
+        final logs = <Object>[];
+        await testBuilder(
+          builder,
+          {
             'a|test/test_html_builder_config.json': jsonEncode(config),
             'a|test/foo_test.dart': '',
             'a|test/template.html': 'MISSING TOKEN',
-          }));
-      expect(
+          },
+          onLog: logs.add,
+        );
+        expect(
           logs,
-          emits(severeLogOf(allOf(
-            contains('template must contain exactly one `{{testScript}}`'),
-            contains('test/template.html'),
-          ))));
-    });
+          contains(
+            severeLogOf(
+              allOf(
+                contains('template must contain exactly one `{{testScript}}`'),
+                contains('test/template.html'),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   });
 }
