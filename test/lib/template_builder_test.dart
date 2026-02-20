@@ -122,21 +122,37 @@ void main() {
       );
     });
 
-    test('does not output .html if template cannot be read', () async {
+    test('logs SEVERE if template cannot be read', () async {
       final config = TestHtmlBuilderConfig(
         templates: {
           'test/template.html': ['test/**_test.dart'],
         },
       );
       final builder = TemplateBuilder();
-      await testBuilder(builder, {
-        'a|test/test_html_builder_config.json': jsonEncode(config),
-        'a|test/foo_test.dart': '',
-      }, outputs: {});
+      final logs = <Object>[];
+      await testBuilder(
+        builder,
+        {
+          'a|test/test_html_builder_config.json': jsonEncode(config),
+          'a|test/foo_test.dart': '',
+        },
+        onLog: logs.add,
+      );
+      expect(
+        logs,
+        contains(
+          severeLogOf(
+            allOf(
+              contains('Could not read template'),
+              contains('test/template.html'),
+            ),
+          ),
+        ),
+      );
     });
 
     test(
-      'does not output .html if template does not contain `{{testScript}}` token',
+      'logs SEVERE if template does not contain `{{testScript}}` token',
       () async {
         final config = TestHtmlBuilderConfig(
           templates: {
@@ -144,11 +160,27 @@ void main() {
           },
         );
         final builder = TemplateBuilder();
-        await testBuilder(builder, {
-          'a|test/test_html_builder_config.json': jsonEncode(config),
-          'a|test/foo_test.dart': '',
-          'a|test/template.html': 'MISSING TOKEN',
-        }, outputs: {});
+        final logs = <Object>[];
+        await testBuilder(
+          builder,
+          {
+            'a|test/test_html_builder_config.json': jsonEncode(config),
+            'a|test/foo_test.dart': '',
+            'a|test/template.html': 'MISSING TOKEN',
+          },
+          onLog: logs.add,
+        );
+        expect(
+          logs,
+          contains(
+            severeLogOf(
+              allOf(
+                contains('template must contain exactly one `{{testScript}}`'),
+                contains('test/template.html'),
+              ),
+            ),
+          ),
+        );
       },
     );
   });
